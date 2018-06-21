@@ -20,7 +20,7 @@ plugins {
 }
 
 version = '2.0.0-SNAPSHOT'
-def dbChangeLogVersion = '1.1.0'
+def dbChangeLogVersion = '2.0.0'
 
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'com.blackducksoftware.integration.solution'
