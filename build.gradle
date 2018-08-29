@@ -27,7 +27,7 @@ plugins {
     id 'com.moowork.node' version '1.2.0'
 }
 
-version = '2.1.0'
+version = '2.1.1-SNAPSHOT'
 
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'com.blackducksoftware.integration.solution'
