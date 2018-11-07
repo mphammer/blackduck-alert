@@ -48,20 +48,24 @@ import com.synopsys.integration.alert.common.descriptor.config.field.SelectConfi
 import com.synopsys.integration.alert.common.descriptor.config.field.TextInputConfigField;
 import com.synopsys.integration.alert.common.enumeration.ActionApiType;
 import com.synopsys.integration.alert.common.enumeration.FrequencyType;
+import com.synopsys.integration.alert.web.api.ResourceLinks;
+import com.synopsys.integration.alert.web.model.UIResource;
 
 @RestController
 @RequestMapping(UIComponentController.DESCRIPTOR_PATH)
 public class UIComponentController extends BaseController {
     public static final String DESCRIPTOR_PATH = BASE_PATH + "/descriptor";
     private final DescriptorMap descriptorMap;
+    private final ResourceLinks resourceLinks;
 
     @Autowired
-    public UIComponentController(final DescriptorMap descriptorMap) {
+    public UIComponentController(final DescriptorMap descriptorMap, final ResourceLinks resourceLinks) {
         this.descriptorMap = descriptorMap;
+        this.resourceLinks = resourceLinks;
     }
 
     @GetMapping
-    public Collection<UIComponent> getDescriptors(@RequestParam(value = "descriptorName", required = false) final String descriptorName, @RequestParam(value = "descriptorType", required = false) final String descriptorConfigType) {
+    public Collection<UIResource> getDescriptors(@RequestParam(value = "descriptorName", required = false) final String descriptorName, @RequestParam(value = "descriptorType", required = false) final String descriptorConfigType) {
         // filter by name
         if (StringUtils.isNotBlank(descriptorName)) {
             final Descriptor descriptor = descriptorMap.getDescriptor(descriptorName);
@@ -71,27 +75,31 @@ public class UIComponentController extends BaseController {
                     final ActionApiType descriptorType = ActionApiType.getRestApiType(descriptorConfigType);
                     final UIConfig uiConfig = descriptor.getUIConfig(descriptorType);
                     if (uiConfig != null) {
-                        return Arrays.asList(uiConfig.generateUIComponent());
+                        final UIComponent uiComponent = uiConfig.generateUIComponent();
+                        return Arrays.asList(createUIResourceWithLinks(uiComponent, descriptor));
                     } else {
                         return Collections.emptyList();
                     }
                 } else {
                     // name only
-                    return descriptor.getAllUIConfigs().stream().map(UIConfig::generateUIComponent).collect(Collectors.toList());
+                    final List<UIComponent> uiComponents = descriptor.getAllUIConfigs().stream().map(UIConfig::generateUIComponent).collect(Collectors.toList());
+                    return createUIResourcesWithLinks(uiComponents, descriptor);
                 }
             } else {
                 return Collections.emptyList();
             }
         } else if (StringUtils.isNotBlank(descriptorConfigType)) {
-            final ActionApiType descriptorConfigTypeEnum = ActionApiType.getRestApiType(descriptorConfigType);
-            return descriptorMap.getUIComponents(descriptorConfigTypeEnum);
+            //            final ActionApiType descriptorConfigTypeEnum = ActionApiType.getRestApiType(descriptorConfigType);
+            //            List<UIComponent> uiComponents = descriptorMap.getUIComponents(descriptorConfigTypeEnum);
+            //            return createUIResourcesWithLinks(uiComponents, des);
         } else {
-            return descriptorMap.getAllUIComponents();
+            //            return descriptorMap.getAllUIComponents();
         }
+        return Collections.emptyList();
     }
 
     @GetMapping("/distribution")
-    public UIComponent getDistributionUIComponent(@RequestParam(value = "providerName", required = true) final String providerName, @RequestParam(value = "channelName", required = true) final String channelName) {
+    public UIResource getDistributionUIComponent(@RequestParam(value = "providerName", required = true) final String providerName, @RequestParam(value = "channelName", required = true) final String channelName) {
         if (StringUtils.isBlank(providerName) || StringUtils.isBlank(channelName)) {
             return null;
         } else {
@@ -111,7 +119,26 @@ public class UIComponentController extends BaseController {
 
             final UIComponent combinedUIComponent = new UIComponent(channelUIComponent.getLabel(), channelUIComponent.getUrlName(), channelUIComponent.getDescriptorName(), channelUIComponent.getFontAwesomeIcon(),
                 channelUIComponent.isAutomaticallyGenerateUI(), combinedFields);
-            return combinedUIComponent;
+            final UIResource uiResource = createUIResourceWithLinks(combinedUIComponent, channelDescriptor);
+            return uiResource;
         }
     }
+
+    private UIResource createUIResourceWithLinks(final UIComponent uiComponent, final Descriptor descriptor) {
+        final UIResource uiResource = new UIResource(uiComponent);
+        final String link = descriptor.getApiLink();
+        final String testLink = descriptor.getTestLink();
+        final String validationLink = descriptor.getValidateLink();
+        resourceLinks.addRelationWithTitle(uiResource, link, descriptor.getTypeValue(), "config");
+        resourceLinks.addRelationWithTitle(uiResource, testLink, descriptor.getTypeValue(), "test");
+        resourceLinks.addRelationWithTitle(uiResource, validationLink, descriptor.getTypeValue(), "validate");
+        return uiResource;
+    }
+
+    private List<UIResource> createUIResourcesWithLinks(final List<UIComponent> uiComponents, final Descriptor descriptor) {
+        return uiComponents.stream()
+                   .map(uiComponent -> createUIResourceWithLinks(uiComponent, descriptor))
+                   .collect(Collectors.toList());
+    }
+
 }

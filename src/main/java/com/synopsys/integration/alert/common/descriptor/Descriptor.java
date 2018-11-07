@@ -35,6 +35,7 @@ import com.synopsys.integration.alert.common.descriptor.config.UIConfig;
 import com.synopsys.integration.alert.common.enumeration.ActionApiType;
 import com.synopsys.integration.alert.common.enumeration.DescriptorType;
 import com.synopsys.integration.alert.database.entity.DatabaseEntity;
+import com.synopsys.integration.alert.web.config.controller.ConfigController;
 import com.synopsys.integration.alert.web.model.Config;
 import com.synopsys.integration.exception.IntegrationException;
 
@@ -51,12 +52,31 @@ public abstract class Descriptor {
         uiConfigs = new HashMap<>();
     }
 
+    public String getApiLink() {
+        final String baseLink = ConfigController.CONFIGURATION_PATH;
+        return String.join("/", baseLink, getTypeValue(), getName());
+    }
+
+    public String getTestLink() {
+        final String apiLink = getApiLink();
+        return String.join("/", apiLink, "test");
+    }
+
+    public String getValidateLink() {
+        final String apiLink = getApiLink();
+        return String.join("/", apiLink, "validate");
+    }
+
     public String getName() {
         return name;
     }
 
     public DescriptorType getType() {
         return type;
+    }
+
+    public String getTypeValue() {
+        return getType().name().toLowerCase();
     }
 
     public void addProviderRestApi(final DescriptorActionApi descriptorActionApi) {
