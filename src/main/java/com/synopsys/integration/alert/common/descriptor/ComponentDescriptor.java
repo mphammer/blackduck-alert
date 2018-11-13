@@ -27,7 +27,7 @@ import com.synopsys.integration.alert.common.descriptor.config.DescriptorActionA
 import com.synopsys.integration.alert.common.descriptor.config.UIConfig;
 import com.synopsys.integration.alert.common.enumeration.DescriptorType;
 
-public class ComponentDescriptor extends Descriptor {
+public abstract class ComponentDescriptor extends Descriptor {
 
     public ComponentDescriptor(final String name, final DescriptorActionApi componentDescriptorActionApi, final UIConfig componentUIConfig) {
         super(name, DescriptorType.COMPONENT);

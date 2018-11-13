@@ -21,7 +21,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.alert.web.controller;
+package com.synopsys.integration.alert.web.api;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.synopsys.integration.alert.web.config.controller.ChannelDistributionConfigController;
+import com.synopsys.integration.alert.web.controller.TestResponseBody;
 
 @RestController
 public class TestController {
@@ -43,7 +44,7 @@ public class TestController {
     public HttpEntity<TestResponseBody> testing(@RequestParam(value = "name", required = false, defaultValue = "Empty") final String content) {
         final TestResponseBody testResponseBody = new TestResponseBody(content);
         testResponseBody.add(linkTo(methodOn(TestController.class).testing(content)).withSelfRel());
-        testResponseBody.add(linkTo(ChannelDistributionConfigController.class).withRel("distribution"));
+        testResponseBody.add(linkTo(ChannelDistributionConfigController.class).slash("Test").withRel("distribution"));
         testResponseBody.add(linkTo(methodOn(ChannelDistributionConfigController.class).testConfig("Testing", "MyOwnDescriptor")).withRel("distribution"));
         testResponseBody.add(linkTo(methodOn(ChannelDistributionConfigController.class).validateConfig("Validating", "MyOwnDescriptor")).withRel("distribution"));
         testResponseBody.add(new Link("https://google.com", "paulo\test").withTitle("Title"));

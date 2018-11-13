@@ -23,69 +23,68 @@
  */
 package com.synopsys.integration.alert.web.config.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.ResourceSupport;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.synopsys.integration.alert.common.ContentConverter;
 import com.synopsys.integration.alert.common.descriptor.DescriptorMap;
 import com.synopsys.integration.alert.common.descriptor.config.DescriptorActionApi;
 import com.synopsys.integration.alert.common.enumeration.ActionApiType;
 import com.synopsys.integration.alert.web.config.actions.SingleEntityConfigActions;
 import com.synopsys.integration.alert.web.config.controller.handler.ConfigControllerHandler;
-import com.synopsys.integration.alert.web.model.Config;
 
 @RestController
 @RequestMapping(ConfigController.CHANNEL_CONFIG + "/global/{descriptorName}")
 public class ChannelGlobalConfigController extends ConfigController {
-    private final ConfigControllerHandler controllerHandler;
     private final DescriptorMap descriptorMap;
+    private final SingleEntityConfigActions singleEntityConfigActions;
+    private final ConfigControllerHandler configControllerHandler;
 
     @Autowired
-    public ChannelGlobalConfigController(final DescriptorMap descriptorMap, final ContentConverter contentConverter, final SingleEntityConfigActions singleEntityConfigActions) {
+    public ChannelGlobalConfigController(final DescriptorMap descriptorMap, final SingleEntityConfigActions singleEntityConfigActions, final ConfigControllerHandler configControllerHandler) {
         this.descriptorMap = descriptorMap;
-        this.controllerHandler = new ConfigControllerHandler(contentConverter, singleEntityConfigActions);
+        this.configControllerHandler = configControllerHandler;
+        this.singleEntityConfigActions = singleEntityConfigActions;
     }
 
     @Override
-    public List<? extends Config> getConfig(final Long id, @PathVariable final String descriptorName) {
+    public ResponseEntity<? extends ResourceSupport> getConfig(final Long id, @PathVariable final String descriptorName) {
         final DescriptorActionApi descriptor = descriptorMap.getChannelDescriptor(descriptorName).getRestApi(ActionApiType.CHANNEL_GLOBAL_CONFIG);
-        return controllerHandler.getConfig(id, descriptor);
+        return configControllerHandler.getConfig(id, descriptorName, descriptor, singleEntityConfigActions, getClass());
     }
 
     @Override
-    public ResponseEntity<String> postConfig(@RequestBody(required = false) final String restModel, @PathVariable final String descriptorName) {
+    public ResponseEntity<? extends ResourceSupport> postConfig(@RequestBody(required = false) final String restModel, @PathVariable final String descriptorName) {
         final DescriptorActionApi descriptor = descriptorMap.getChannelDescriptor(descriptorName).getRestApi(ActionApiType.CHANNEL_GLOBAL_CONFIG);
-        return controllerHandler.postConfig(descriptor.getConfigFromJson(restModel), descriptor);
+        return configControllerHandler.postConfig(descriptor.getConfigFromJson(restModel), descriptorName, descriptor, singleEntityConfigActions, getClass());
     }
 
     @Override
-    public ResponseEntity<String> putConfig(@RequestBody(required = false) final String restModel, @PathVariable final String descriptorName) {
+    public ResponseEntity<? extends ResourceSupport> putConfig(@RequestBody(required = false) final String restModel, @PathVariable final String descriptorName) {
         final DescriptorActionApi descriptor = descriptorMap.getChannelDescriptor(descriptorName).getRestApi(ActionApiType.CHANNEL_GLOBAL_CONFIG);
-        return controllerHandler.putConfig(descriptor.getConfigFromJson(restModel), descriptor);
+        return configControllerHandler.putConfig(descriptor.getConfigFromJson(restModel), descriptorName, descriptor, singleEntityConfigActions, getClass());
     }
 
     @Override
-    public ResponseEntity<String> validateConfig(@RequestBody(required = false) final String restModel, @PathVariable final String descriptorName) {
+    public ResponseEntity<? extends ResourceSupport> validateConfig(@RequestBody(required = false) final String restModel, @PathVariable final String descriptorName) {
         final DescriptorActionApi descriptor = descriptorMap.getChannelDescriptor(descriptorName).getRestApi(ActionApiType.CHANNEL_GLOBAL_CONFIG);
-        return controllerHandler.validateConfig(descriptor.getConfigFromJson(restModel), descriptor);
+        return configControllerHandler.validateConfig(descriptor.getConfigFromJson(restModel), descriptorName, descriptor, singleEntityConfigActions, getClass());
     }
 
     @Override
-    public ResponseEntity<String> deleteConfig(final Long id, @PathVariable final String descriptorName) {
+    public ResponseEntity<? extends ResourceSupport> deleteConfig(final Long id, @PathVariable final String descriptorName) {
         final DescriptorActionApi descriptor = descriptorMap.getChannelDescriptor(descriptorName).getRestApi(ActionApiType.CHANNEL_GLOBAL_CONFIG);
-        return controllerHandler.deleteConfig(id, descriptor);
+        return configControllerHandler.deleteConfig(id, descriptorName, descriptor, singleEntityConfigActions, getClass());
     }
 
     @Override
-    public ResponseEntity<String> testConfig(@RequestBody(required = false) final String restModel, @PathVariable final String descriptorName) {
+    public ResponseEntity<? extends ResourceSupport> testConfig(@RequestBody(required = false) final String restModel, @PathVariable final String descriptorName) {
         final DescriptorActionApi descriptor = descriptorMap.getChannelDescriptor(descriptorName).getRestApi(ActionApiType.CHANNEL_GLOBAL_CONFIG);
-        return controllerHandler.testConfig(descriptor.getConfigFromJson(restModel), descriptor);
+        return configControllerHandler.testConfig(descriptor.getConfigFromJson(restModel), descriptorName, descriptor, singleEntityConfigActions, getClass());
     }
 
 }

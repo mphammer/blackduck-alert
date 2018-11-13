@@ -21,23 +21,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.alert.web.model;
+package com.synopsys.integration.alert.web.api;
+
+import java.util.List;
 
 import org.springframework.hateoas.ResourceSupport;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.synopsys.integration.alert.common.descriptor.config.UIComponent;
+import com.synopsys.integration.alert.web.model.Config;
 
-public class UIResource extends ResourceSupport {
-    private final UIComponent uiComponent;
+public class ConfigResource extends ResourceSupport {
+    private final List<? extends Config> configs;
 
     @JsonCreator
-    public UIResource(@JsonProperty final UIComponent uiComponent) {
-        this.uiComponent = uiComponent;
+    public ConfigResource(@JsonProperty final List<? extends Config> configs) {
+        this.configs = configs;
     }
 
-    public UIComponent getUiComponent() {
-        return uiComponent;
+    public List<? extends Config> getConfigs() {
+        return configs;
     }
 }

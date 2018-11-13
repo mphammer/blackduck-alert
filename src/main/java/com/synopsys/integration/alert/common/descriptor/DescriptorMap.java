@@ -35,6 +35,7 @@ import org.springframework.stereotype.Component;
 import com.synopsys.integration.alert.common.descriptor.config.DescriptorActionApi;
 import com.synopsys.integration.alert.common.descriptor.config.UIComponent;
 import com.synopsys.integration.alert.common.enumeration.ActionApiType;
+import com.synopsys.integration.alert.common.enumeration.DescriptorType;
 import com.synopsys.integration.alert.common.exception.AlertException;
 
 @Component
@@ -102,6 +103,13 @@ public class DescriptorMap {
     public List<UIComponent> getAllUIComponents() {
         return Arrays.stream(ActionApiType.values())
                    .flatMap(type -> getUIComponents(type).stream())
+                   .collect(Collectors.toList());
+    }
+
+    public <D extends Descriptor> List<D> getDescriptors(final DescriptorType descriptorType, final Class<D> descriptorClass) {
+        return descriptorMap.values().stream()
+                   .filter(descriptor -> descriptorType.equals(descriptor.getType()))
+                   .map(descriptor -> descriptorClass.cast(descriptor))
                    .collect(Collectors.toList());
     }
 

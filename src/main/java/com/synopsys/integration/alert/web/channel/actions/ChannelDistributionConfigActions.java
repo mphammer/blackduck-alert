@@ -47,6 +47,7 @@ import com.synopsys.integration.alert.web.model.Config;
 
 @Component
 public class ChannelDistributionConfigActions extends DescriptorConfigActions {
+    private static final String UNKNOWN = "Unknown";
     private final CommonDistributionRepository commonDistributionRepository;
     private final AuditEntryRepository auditEntryRepository;
     private final AuditNotificationRepository auditNotificationRepository;
@@ -81,8 +82,8 @@ public class ChannelDistributionConfigActions extends DescriptorConfigActions {
     }
 
     private void addAuditEntryInfoToRestModel(final CommonDistributionConfig restModel) {
-        String lastRan = "Unknown";
-        String status = "Unknown";
+        String lastRan = UNKNOWN;
+        String status = UNKNOWN;
         final Long id = getContentConverter().getLongValue(restModel.getId());
         final AuditEntryEntity lastRanEntry = auditEntryRepository.findFirstByCommonConfigIdOrderByTimeLastSentDesc(id);
         if (lastRanEntry != null) {

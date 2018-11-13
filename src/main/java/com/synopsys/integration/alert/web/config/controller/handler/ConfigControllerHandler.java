@@ -29,128 +29,128 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.ResourceSupport;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 
-import com.synopsys.integration.alert.common.ContentConverter;
 import com.synopsys.integration.alert.common.descriptor.config.DescriptorActionApi;
 import com.synopsys.integration.alert.common.exception.AlertException;
 import com.synopsys.integration.alert.database.entity.DatabaseEntity;
+import com.synopsys.integration.alert.web.api.ControllerResponseFactory;
 import com.synopsys.integration.alert.web.config.actions.DescriptorConfigActions;
-import com.synopsys.integration.alert.web.controller.handler.ControllerHandler;
+import com.synopsys.integration.alert.web.config.controller.ConfigController;
 import com.synopsys.integration.alert.web.exception.AlertFieldException;
 import com.synopsys.integration.alert.web.model.Config;
-import com.synopsys.integration.alert.web.model.ResponseBodyBuilder;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.exception.IntegrationRestException;
 
-public class ConfigControllerHandler extends ControllerHandler {
+@Component
+public class ConfigControllerHandler {
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private final DescriptorConfigActions descriptorConfigActions;
+    private final ControllerResponseFactory controllerResponseFactory;
 
-    public ConfigControllerHandler(final ContentConverter contentConverter, final DescriptorConfigActions descriptorConfigActions) {
-        super(contentConverter);
-        this.descriptorConfigActions = descriptorConfigActions;
+    @Autowired
+    public ConfigControllerHandler(final ControllerResponseFactory controllerResponseFactory) {
+        this.controllerResponseFactory = controllerResponseFactory;
     }
 
-    public List<? extends Config> getConfig(final Long id, final DescriptorActionApi descriptor) {
+    public ResponseEntity<? extends ResourceSupport> getConfig(final Long id, final String descriptorName, final DescriptorActionApi descriptor, final DescriptorConfigActions descriptorConfigActions,
+        final Class<? extends ConfigController> controllerClass) {
         try {
-            return descriptorConfigActions.getConfig(id, descriptor);
+            final List<? extends Config> configs = descriptorConfigActions.getConfig(id, descriptor);
+            return controllerResponseFactory.createConfigResourcesWithAllLinks(configs, descriptorName, controllerClass);
         } catch (final AlertException e) {
             logger.error(e.getMessage(), e);
         }
-        return Collections.emptyList();
+        return controllerResponseFactory.createConfigResourcesWithAllLinks(Collections.emptyList(), descriptorName, controllerClass);
     }
 
-    public ResponseEntity<String> postConfig(final Config restModel, final DescriptorActionApi descriptor) {
+    public ResponseEntity<? extends ResourceSupport> postConfig(final Config restModel, final String descriptorName, final DescriptorActionApi descriptor, final DescriptorConfigActions descriptorConfigActions,
+        final Class<? extends ConfigController> controllerClass) {
         if (restModel == null) {
-            return createResponse(HttpStatus.BAD_REQUEST, "", "Required request body is missing");
+            return controllerResponseFactory.createMissingRequestBody();
         }
         if (!descriptorConfigActions.doesConfigExist(restModel.getId(), descriptor)) {
             try {
                 descriptorConfigActions.validateConfig(restModel, descriptor, new HashMap<>());
                 final DatabaseEntity updatedEntity = descriptorConfigActions.saveConfig(restModel, descriptor);
-                return createResponse(HttpStatus.CREATED, updatedEntity.getId(), "Created");
+                return controllerResponseFactory.createResponseWithAllLinks(HttpStatus.CREATED, updatedEntity.getId(), "Created", descriptorName, controllerClass);
             } catch (final AlertFieldException e) {
-                final ResponseBodyBuilder responseBuilder = new ResponseBodyBuilder(getContentConverter().getLongValue(restModel.getId()), "There were errors with the configuration.");
-                responseBuilder.putErrors(e.getFieldErrors());
-                return new ResponseEntity<>(responseBuilder.build(), HttpStatus.BAD_REQUEST);
+                return controllerResponseFactory.createResponseWithoutLinksWithErrors(HttpStatus.BAD_REQUEST, restModel.getId(), "There were errors with the configuration.", e.getFieldErrors());
             }
         }
-        return createResponse(HttpStatus.CONFLICT, restModel.getId(), "Provided id must not be in use. To update an existing configuration, use PUT.");
+        return controllerResponseFactory.createResponseWithoutLinks(HttpStatus.CONFLICT, restModel.getId(), "Provided id must not be in use. To update an existing configuration, use PUT.");
     }
 
-    public ResponseEntity<String> putConfig(final Config restModel, final DescriptorActionApi descriptor) {
+    public ResponseEntity<? extends ResourceSupport> putConfig(final Config restModel, final String descriptorName, final DescriptorActionApi descriptor, final DescriptorConfigActions descriptorConfigActions,
+        final Class<? extends ConfigController> controllerClass) {
         if (restModel == null) {
-            return createResponse(HttpStatus.BAD_REQUEST, "", "Required request body is missing");
+            return controllerResponseFactory.createMissingRequestBody();
         }
         if (descriptorConfigActions.doesConfigExist(restModel.getId(), descriptor)) {
             try {
                 descriptorConfigActions.validateConfig(restModel, descriptor, new HashMap<>());
                 try {
                     final DatabaseEntity updatedEntity = descriptorConfigActions.updateConfig(restModel, descriptor);
-                    return createResponse(HttpStatus.ACCEPTED, updatedEntity.getId(), "Updated");
+                    return controllerResponseFactory.createResponseWithAllLinks(HttpStatus.ACCEPTED, updatedEntity.getId(), "Updated", descriptorName, controllerClass);
                 } catch (final AlertException e) {
                     logger.error(e.getMessage(), e);
-                    return createResponse(HttpStatus.INTERNAL_SERVER_ERROR, restModel.getId(), e.getMessage());
+                    return controllerResponseFactory.createResponseWithoutLinks(HttpStatus.INTERNAL_SERVER_ERROR, restModel.getId(), e.getMessage());
                 }
             } catch (final AlertFieldException e) {
-                final ResponseBodyBuilder responseBuilder = new ResponseBodyBuilder(getContentConverter().getLongValue(restModel.getId()), "There were errors with the configuration.");
-                responseBuilder.putErrors(e.getFieldErrors());
-                return new ResponseEntity<>(responseBuilder.build(), HttpStatus.BAD_REQUEST);
+                return controllerResponseFactory.createResponseWithoutLinksWithErrors(HttpStatus.BAD_REQUEST, restModel.getId(), "There were errors with the configuration.", e.getFieldErrors());
             }
         }
-        return createResponse(HttpStatus.BAD_REQUEST, restModel.getId(), "No configuration with the specified id.");
+        return controllerResponseFactory.createResponseWithoutLinks(HttpStatus.BAD_REQUEST, restModel.getId(), "No configuration with the specified id.");
     }
 
-    public ResponseEntity<String> deleteConfig(final Long id, final DescriptorActionApi descriptor) {
+    public ResponseEntity<? extends ResourceSupport> deleteConfig(final Long id, final String descriptorName, final DescriptorActionApi descriptor, final DescriptorConfigActions descriptorConfigActions,
+        final Class<? extends ConfigController> controllerClass) {
         if (id != null && descriptorConfigActions.doesConfigExist(id, descriptor)) {
             descriptorConfigActions.deleteConfig(id, descriptor);
-            return createResponse(HttpStatus.ACCEPTED, id, "Deleted");
+            return controllerResponseFactory.createResponseWithAllLinks(HttpStatus.ACCEPTED, id, "Deleted", descriptorName, controllerClass);
         }
-        return createResponse(HttpStatus.BAD_REQUEST, id, "No configuration with the specified id.");
+        return controllerResponseFactory.createResponseWithoutLinks(HttpStatus.BAD_REQUEST, id, "No configuration with the specified id.");
     }
 
-    public ResponseEntity<String> validateConfig(final Config restModel, final DescriptorActionApi descriptor) {
+    public ResponseEntity<? extends ResourceSupport> validateConfig(final Config restModel, final String descriptorName, final DescriptorActionApi descriptor, final DescriptorConfigActions descriptorConfigActions,
+        final Class<? extends ConfigController> controllerClass) {
         if (restModel == null) {
-            return createResponse(HttpStatus.BAD_REQUEST, "", "Required request body is missing");
+            return controllerResponseFactory.createMissingRequestBody();
         }
         try {
             final String responseMessage = descriptorConfigActions.validateConfig(restModel, descriptor, new HashMap<>());
-            return createResponse(HttpStatus.OK, restModel.getId(), responseMessage);
+            return controllerResponseFactory.createResponseWithAllLinks(HttpStatus.OK, restModel.getId(), responseMessage, descriptorName, controllerClass);
         } catch (final AlertFieldException e) {
-            final ResponseBodyBuilder responseBodyBuilder = new ResponseBodyBuilder(getContentConverter().getLongValue(restModel.getId()), e.getMessage());
-            responseBodyBuilder.putErrors(e.getFieldErrors());
-            final String responseBody = responseBodyBuilder.build();
-            return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+            return controllerResponseFactory.createResponseWithoutLinksWithErrors(HttpStatus.BAD_REQUEST, restModel.getId(), e.getMessage(), e.getFieldErrors());
         }
     }
 
-    public ResponseEntity<String> testConfig(final Config restModel, final DescriptorActionApi descriptor) {
+    public ResponseEntity<? extends ResourceSupport> testConfig(final Config restModel, final String descriptorName, final DescriptorActionApi descriptor, final DescriptorConfigActions descriptorConfigActions,
+        final Class<? extends ConfigController> controllerClass) {
         if (restModel == null) {
-            return createResponse(HttpStatus.BAD_REQUEST, "", "Required request body is missing");
+            return controllerResponseFactory.createMissingRequestBody();
         }
         try {
             final String responseMessage = descriptorConfigActions.testConfig(restModel, descriptor);
-            return createResponse(HttpStatus.OK, restModel.getId(), responseMessage);
+            return controllerResponseFactory.createResponseWithAllLinks(HttpStatus.OK, restModel.getId(), responseMessage, descriptorName, controllerClass);
         } catch (final IntegrationRestException e) {
             logger.error(e.getMessage(), e);
-            return createResponse(HttpStatus.valueOf(e.getHttpStatusCode()), restModel.getId(), e.getHttpStatusMessage() + " : " + e.getMessage());
+            final String errorMessage = e.getHttpStatusMessage() + " : " + e.getMessage();
+            final HttpStatus httpStatus = HttpStatus.valueOf(e.getHttpStatusCode());
+            return controllerResponseFactory.createResponseWithoutLinks(httpStatus, restModel.getId(), errorMessage);
         } catch (final AlertFieldException e) {
-            final ResponseBodyBuilder responseBodyBuilder = new ResponseBodyBuilder(getContentConverter().getLongValue(restModel.getId()), e.getMessage());
-            responseBodyBuilder.putErrors(e.getFieldErrors());
-            final String responseBody = responseBodyBuilder.build();
-            return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+            return controllerResponseFactory.createResponseWithoutLinksWithErrors(HttpStatus.BAD_REQUEST, restModel.getId(), e.getMessage(), e.getFieldErrors());
         } catch (final AlertException e) {
-            final ResponseBodyBuilder responseBodyBuilder = new ResponseBodyBuilder(getContentConverter().getLongValue(restModel.getId()), e.getMessage());
-            final String responseBody = responseBodyBuilder.build();
-            return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+            return controllerResponseFactory.createResponseWithoutLinks(HttpStatus.BAD_REQUEST, restModel.getId(), e.getMessage());
         } catch (final IntegrationException e) {
             logger.error(e.getMessage(), e);
-            return createResponse(HttpStatus.METHOD_NOT_ALLOWED, restModel.getId(), e.getMessage());
+            return controllerResponseFactory.createMethodNotAllowed(restModel.getId(), e.getMessage());
         } catch (final Exception e) {
             logger.error(e.getMessage(), e);
-            return createResponse(HttpStatus.INTERNAL_SERVER_ERROR, restModel.getId(), e.getMessage());
+            return controllerResponseFactory.createResponseWithoutLinks(HttpStatus.INTERNAL_SERVER_ERROR, restModel.getId(), e.getMessage());
         }
     }
 }

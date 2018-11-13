@@ -23,20 +23,20 @@
  */
 package com.synopsys.integration.alert.web.api;
 
-import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceSupport;
-import org.springframework.stereotype.Component;
 
-@Component
-public class ResourceLinks {
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    public void addRelationWithTitle(final ResourceSupport resourceSupport, final String link, final String rel, final String title) {
-        final Link descriptorLink = createLink(link, rel, title);
-        resourceSupport.add(descriptorLink);
+public class MessageResource extends ResourceSupport {
+    private final String message;
+
+    @JsonCreator
+    public MessageResource(@JsonProperty final String message) {
+        this.message = message;
     }
 
-    public Link createLink(final String link, final String rel, final String title) {
-        return new Link(link, rel).withTitle(title);
+    public String getMessage() {
+        return message;
     }
-
 }

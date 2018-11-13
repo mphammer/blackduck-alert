@@ -23,8 +23,7 @@
  */
 package com.synopsys.integration.alert.web.config.controller;
 
-import java.util.List;
-
+import org.springframework.hateoas.ResourceSupport;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,7 +32,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.synopsys.integration.alert.web.controller.BaseController;
-import com.synopsys.integration.alert.web.model.Config;
 
 @RequestMapping(ConfigController.CONFIGURATION_PATH)
 public abstract class ConfigController extends BaseController {
@@ -43,20 +41,21 @@ public abstract class ConfigController extends BaseController {
     public static final String COMPONENT_CONFIG = CONFIGURATION_PATH + "/component";
 
     @GetMapping
-    public abstract List<? extends Config> getConfig(final Long id, final String descriptorName);
+    public abstract ResponseEntity<? extends ResourceSupport> getConfig(final Long id, final String descriptorName);
 
     @PostMapping
-    public abstract ResponseEntity<String> postConfig(String config, final String descriptorName);
+    public abstract ResponseEntity<? extends ResourceSupport> postConfig(String config, final String descriptorName);
 
     @PutMapping
-    public abstract ResponseEntity<String> putConfig(String config, final String descriptorName);
+    public abstract ResponseEntity<? extends ResourceSupport> putConfig(String config, final String descriptorName);
 
     @PostMapping(value = "/validate")
-    public abstract ResponseEntity<String> validateConfig(String config, final String descriptorName);
+    public abstract ResponseEntity<? extends ResourceSupport> validateConfig(String config, final String descriptorName);
 
     @DeleteMapping
-    public abstract ResponseEntity<String> deleteConfig(Long id, final String descriptorName);
+    public abstract ResponseEntity<? extends ResourceSupport> deleteConfig(Long id, final String descriptorName);
 
     @PostMapping(value = "/test")
-    public abstract ResponseEntity<String> testConfig(String config, final String descriptorName);
+    public abstract ResponseEntity<? extends ResourceSupport> testConfig(String config, final String descriptorName);
+
 }

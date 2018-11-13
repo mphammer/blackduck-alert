@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,59 +48,64 @@ import com.synopsys.integration.alert.common.descriptor.config.field.ConfigField
 import com.synopsys.integration.alert.common.descriptor.config.field.SelectConfigField;
 import com.synopsys.integration.alert.common.descriptor.config.field.TextInputConfigField;
 import com.synopsys.integration.alert.common.enumeration.ActionApiType;
+import com.synopsys.integration.alert.common.enumeration.DescriptorType;
 import com.synopsys.integration.alert.common.enumeration.FrequencyType;
-import com.synopsys.integration.alert.web.api.ResourceLinks;
-import com.synopsys.integration.alert.web.model.UIResource;
+import com.synopsys.integration.alert.web.api.APILinkCreator;
+import com.synopsys.integration.alert.web.api.ConfigResource;
 
 @RestController
 @RequestMapping(UIComponentController.DESCRIPTOR_PATH)
 public class UIComponentController extends BaseController {
     public static final String DESCRIPTOR_PATH = BASE_PATH + "/descriptor";
     private final DescriptorMap descriptorMap;
-    private final ResourceLinks resourceLinks;
+    private final APILinkCreator APILinkCreator;
 
     @Autowired
-    public UIComponentController(final DescriptorMap descriptorMap, final ResourceLinks resourceLinks) {
+    public UIComponentController(final DescriptorMap descriptorMap, final APILinkCreator APILinkCreator) {
         this.descriptorMap = descriptorMap;
-        this.resourceLinks = resourceLinks;
+        this.APILinkCreator = APILinkCreator;
     }
 
     @GetMapping
-    public Collection<UIResource> getDescriptors(@RequestParam(value = "descriptorName", required = false) final String descriptorName, @RequestParam(value = "descriptorType", required = false) final String descriptorConfigType) {
-        // filter by name
-        if (StringUtils.isNotBlank(descriptorName)) {
-            final Descriptor descriptor = descriptorMap.getDescriptor(descriptorName);
-            if (descriptor != null) {
-                // filter by type also
-                if (StringUtils.isNotBlank(descriptorConfigType)) {
-                    final ActionApiType descriptorType = ActionApiType.getRestApiType(descriptorConfigType);
-                    final UIConfig uiConfig = descriptor.getUIConfig(descriptorType);
-                    if (uiConfig != null) {
-                        final UIComponent uiComponent = uiConfig.generateUIComponent();
-                        return Arrays.asList(createUIResourceWithLinks(uiComponent, descriptor));
-                    } else {
-                        return Collections.emptyList();
-                    }
-                } else {
-                    // name only
-                    final List<UIComponent> uiComponents = descriptor.getAllUIConfigs().stream().map(UIConfig::generateUIComponent).collect(Collectors.toList());
-                    return createUIResourcesWithLinks(uiComponents, descriptor);
-                }
-            } else {
-                return Collections.emptyList();
-            }
-        } else if (StringUtils.isNotBlank(descriptorConfigType)) {
-            //            final ActionApiType descriptorConfigTypeEnum = ActionApiType.getRestApiType(descriptorConfigType);
-            //            List<UIComponent> uiComponents = descriptorMap.getUIComponents(descriptorConfigTypeEnum);
-            //            return createUIResourcesWithLinks(uiComponents, des);
-        } else {
-            //            return descriptorMap.getAllUIComponents();
+    public Collection<ConfigResource> getAllUIResources(@RequestParam(value = "descriptorType", required = false) final String descriptorType) {
+        Collection<Descriptor> foundDescriptors = descriptorMap.getDescriptorMap().values();
+        final DescriptorType sentDescriptorType = DescriptorType.valueOf(descriptorType);
+        if (null == sentDescriptorType) {
+            foundDescriptors = descriptorMap.getDescriptors(sentDescriptorType, Descriptor.class);
         }
-        return Collections.emptyList();
+
+        final List<ConfigResource> foundConfigResources = new ArrayList<>();
+        for (final Descriptor descriptor : foundDescriptors) {
+            final List<UIComponent> uiComponents = descriptor.getAllUIConfigs().stream().map(uiConfig -> uiConfig.generateUIComponent()).collect(Collectors.toList());
+            foundConfigResources.addAll(createUIResourcesWithLinks(uiComponents, descriptor));
+        }
+
+        return foundConfigResources;
+    }
+
+    @GetMapping("/{descriptorName}")
+    public Collection<ConfigResource> getUIResourceForDescriptor(@PathVariable final String descriptorName, @RequestParam(name = "actionApiType", required = false) final String actionApiType) {
+        final Descriptor descriptor = descriptorMap.getDescriptor(descriptorName);
+
+        if (null == descriptor) {
+            return Collections.emptyList();
+        }
+
+        final ActionApiType descriptorActionApiType = ActionApiType.getRestApiType(actionApiType);
+        if (null != descriptorActionApiType) {
+            final UIConfig uiConfig = descriptor.getUIConfig(descriptorActionApiType);
+            final UIComponent uiComponent = uiConfig.generateUIComponent();
+            return Arrays.asList(createUIResourceWithLinks(uiComponent, descriptor.getName()));
+        }
+
+        final List<UIComponent> uiComponents = descriptor.getAllUIConfigs().stream()
+                                                   .map(uiConfig -> uiConfig.generateUIComponent())
+                                                   .collect(Collectors.toList());
+        return createUIResourcesWithLinks(uiComponents, descriptor);
     }
 
     @GetMapping("/distribution")
-    public UIResource getDistributionUIComponent(@RequestParam(value = "providerName", required = true) final String providerName, @RequestParam(value = "channelName", required = true) final String channelName) {
+    public ConfigResource getDistributionUIComponent(@RequestParam(value = "providerName", required = true) final String providerName, @RequestParam(value = "channelName", required = true) final String channelName) {
         if (StringUtils.isBlank(providerName) || StringUtils.isBlank(channelName)) {
             return null;
         } else {
@@ -119,25 +125,20 @@ public class UIComponentController extends BaseController {
 
             final UIComponent combinedUIComponent = new UIComponent(channelUIComponent.getLabel(), channelUIComponent.getUrlName(), channelUIComponent.getDescriptorName(), channelUIComponent.getFontAwesomeIcon(),
                 channelUIComponent.isAutomaticallyGenerateUI(), combinedFields);
-            final UIResource uiResource = createUIResourceWithLinks(combinedUIComponent, channelDescriptor);
-            return uiResource;
+            final ConfigResource ConfigResource = createUIResourceWithLinks(combinedUIComponent, channelDescriptor.getName());
+            return ConfigResource;
         }
     }
 
-    private UIResource createUIResourceWithLinks(final UIComponent uiComponent, final Descriptor descriptor) {
-        final UIResource uiResource = new UIResource(uiComponent);
-        final String link = descriptor.getApiLink();
-        final String testLink = descriptor.getTestLink();
-        final String validationLink = descriptor.getValidateLink();
-        resourceLinks.addRelationWithTitle(uiResource, link, descriptor.getTypeValue(), "config");
-        resourceLinks.addRelationWithTitle(uiResource, testLink, descriptor.getTypeValue(), "test");
-        resourceLinks.addRelationWithTitle(uiResource, validationLink, descriptor.getTypeValue(), "validate");
-        return uiResource;
+    private ConfigResource createUIResourceWithLinks(final UIComponent uiComponent, final String descriptorName) {
+        final String uiComponentJson = uiComponent.toString();
+        final ConfigResource configResource = new ConfigResource(Collections.emptyList());
+        return configResource;
     }
 
-    private List<UIResource> createUIResourcesWithLinks(final List<UIComponent> uiComponents, final Descriptor descriptor) {
+    private List<ConfigResource> createUIResourcesWithLinks(final List<UIComponent> uiComponents, final Descriptor descriptor) {
         return uiComponents.stream()
-                   .map(uiComponent -> createUIResourceWithLinks(uiComponent, descriptor))
+                   .map(uiComponent -> createUIResourceWithLinks(uiComponent, descriptor.getName()))
                    .collect(Collectors.toList());
     }
 
