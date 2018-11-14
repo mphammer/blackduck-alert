@@ -52,7 +52,6 @@ public class BlackDuckProperties {
 
     private boolean needsUpdate;
     private HubServerConfig hubServerConfig;
-    private BlackduckRestConnection restConnection;
 
     // the blackduck product hasn't renamed their environment variables from hub to blackduck
     // need to keep hub in the name until
@@ -121,27 +120,22 @@ public class BlackDuckProperties {
         return new HubServicesFactory(HubServicesFactory.createDefaultGson(), HubServicesFactory.createDefaultJsonParser(), restConnection, logger);
     }
 
-    public BlackduckRestConnection getRestConnection(final Logger logger) throws AlertException {
-        if (null == restConnection || needsUpdate) {
-            final IntLogger intLogger = new Slf4jIntLogger(logger);
-            final HubServerConfig foundHubServerConfig = getHubServerConfig(intLogger);
-            final Optional<BlackduckRestConnection> optionalBlackDuckRestConnection = createRestConnectionAndLogErrors(intLogger, foundHubServerConfig);
-            if (!optionalBlackDuckRestConnection.isPresent()) {
-                resetConnections();
-                throw new AlertException("Black Duck connection could not be established.");
-            } else {
-                restConnection = optionalBlackDuckRestConnection.get();
-            }
+    public BlackduckRestConnection createRestConnection(final Logger logger) throws AlertException {
+        final IntLogger intLogger = new Slf4jIntLogger(logger);
+        final HubServerConfig foundHubServerConfig = getHubServerConfig(intLogger);
+        final Optional<BlackduckRestConnection> optionalBlackDuckRestConnection = createRestConnectionAndLogErrors(intLogger, foundHubServerConfig);
+        if (!optionalBlackDuckRestConnection.isPresent()) {
+            markForUpdate();
+            throw new AlertException("Black Duck connection could not be established.");
         }
-
-        return restConnection;
+        return optionalBlackDuckRestConnection.get();
     }
 
     public HubServerConfig getHubServerConfig(final IntLogger intLogger) throws AlertException {
-        if (null == hubServerConfig || needsUpdate) {
+        if (needsUpdate) {
             final Optional<HubServerConfig> optionalHubServerConfig = createBlackDuckServerConfig(intLogger);
             if (!optionalHubServerConfig.isPresent()) {
-                resetConnections();
+                markForUpdate();
                 throw new AlertException("Server configuration is missing.");
             } else {
                 setHubServerConfig(optionalHubServerConfig.get());
@@ -157,14 +151,7 @@ public class BlackDuckProperties {
 
     private void setHubServerConfig(final HubServerConfig hubServerConfig) {
         this.hubServerConfig = hubServerConfig;
-        restConnection = null;
         needsUpdate = false;
-    }
-
-    private void resetConnections() {
-        restConnection = null;
-        hubServerConfig = null;
-        markForUpdate();
     }
 
     private Optional<BlackduckRestConnection> createRestConnectionAndLogErrors(final IntLogger logger, final HubServerConfig hubServerConfig) {

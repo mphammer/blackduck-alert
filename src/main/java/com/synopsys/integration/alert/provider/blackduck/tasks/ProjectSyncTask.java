@@ -81,7 +81,7 @@ public class ProjectSyncTask extends ScheduledTask {
     public void run() {
         logger.info("### Starting {}...", getTaskName());
         try {
-            try (final BlackduckRestConnection restConnection = blackDuckProperties.getRestConnection(logger)) {
+            try (final BlackduckRestConnection restConnection = blackDuckProperties.createRestConnection(logger)) {
                 final HubServicesFactory hubServicesFactory = blackDuckProperties.createBlackDuckServicesFactory(restConnection, new Slf4jIntLogger(logger));
                 final HubService hubService = hubServicesFactory.createHubService();
                 final ProjectService projectService = hubServicesFactory.createProjectService();

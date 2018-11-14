@@ -65,7 +65,7 @@ public class NotificationGeneratorUtils {
         factory.populateContentDetails(notificationContentDetails, notificationGroup, content);
 
         return Arrays.asList(new NotificationDetailResult(content, commonNotificationView.getContentType(), commonNotificationView.getCreatedAt(), commonNotificationView.getType(), notificationGroup,
-                Optional.ofNullable(commonNotificationView.getNotificationState()), notificationContentDetails));
+            Optional.ofNullable(commonNotificationView.getNotificationState()), notificationContentDetails));
     }
 
     public static List<NotificationDetailResult> createNotificationDetailList(final NotificationView view, final RuleViolationClearedNotificationContent content) {
@@ -76,7 +76,7 @@ public class NotificationGeneratorUtils {
         factory.populateContentDetails(notificationContentDetails, notificationGroup, content);
 
         return Arrays.asList(new NotificationDetailResult(content, commonNotificationView.getContentType(), commonNotificationView.getCreatedAt(), commonNotificationView.getType(), notificationGroup,
-                Optional.ofNullable(commonNotificationView.getNotificationState()), notificationContentDetails));
+            Optional.ofNullable(commonNotificationView.getNotificationState()), notificationContentDetails));
     }
 
     public static List<NotificationDetailResult> createNotificationDetailList(final NotificationView view, final PolicyOverrideNotificationContent content) {
@@ -87,7 +87,7 @@ public class NotificationGeneratorUtils {
         factory.populateContentDetails(notificationContentDetails, notificationGroup, content);
 
         return Arrays.asList(new NotificationDetailResult(content, commonNotificationView.getContentType(), commonNotificationView.getCreatedAt(), commonNotificationView.getType(), notificationGroup,
-                Optional.ofNullable(commonNotificationView.getNotificationState()), notificationContentDetails));
+            Optional.ofNullable(commonNotificationView.getNotificationState()), notificationContentDetails));
     }
 
     public static NotificationDetailResult createNotificationDetailList(final NotificationView view, final VulnerabilityNotificationContent content) {
@@ -98,7 +98,7 @@ public class NotificationGeneratorUtils {
         factory.populateContentDetails(notificationContentDetails, notificationGroup, content);
 
         return new NotificationDetailResult(content, commonNotificationView.getContentType(), commonNotificationView.getCreatedAt(), commonNotificationView.getType(), notificationGroup,
-                Optional.ofNullable(commonNotificationView.getNotificationState()), notificationContentDetails);
+            Optional.ofNullable(commonNotificationView.getNotificationState()), notificationContentDetails);
     }
 
     public static NotificationDetailResults createNotificationResults(final List<NotificationDetailResult> detailList) {
@@ -113,14 +113,14 @@ public class NotificationGeneratorUtils {
 
     @SuppressWarnings("unchecked")
     public static NotificationDetailResults initializeTestData(final BlackDuckProperties blackDuckProperties, final ComponentVersionView versionView, final VulnerabilityNotificationContent content, final HubBucket bucket)
-            throws IntegrationException {
+        throws IntegrationException {
         final HubServicesFactory blackDuckServicesFactory = Mockito.mock(HubServicesFactory.class);
         final HubService blackDuckService = Mockito.mock(HubService.class);
         final HubBucketService bucketService = Mockito.mock(HubBucketService.class);
         final List<VulnerabilityV2View> vulnerabilityViewList = createVulnerabilityList();
         final BlackduckRestConnection restConnection = Mockito.mock(BlackduckRestConnection.class);
 
-        Mockito.when(blackDuckProperties.createRestConnectionAndLogErrors(Mockito.any())).thenReturn(Optional.of(restConnection));
+        Mockito.when(blackDuckProperties.createRestConnection(Mockito.any())).thenReturn(restConnection);
         Mockito.when(blackDuckProperties.createBlackDuckServicesFactory(Mockito.any(), Mockito.any())).thenReturn(blackDuckServicesFactory);
         Mockito.when(blackDuckServicesFactory.createHubService()).thenReturn(blackDuckService);
         Mockito.when(blackDuckServicesFactory.createHubBucketService()).thenReturn(bucketService);

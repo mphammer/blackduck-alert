@@ -48,11 +48,13 @@ public class BlackDuckProvider extends Provider {
 
     private final BlackDuckAccumulator accumulatorTask;
     private final ProjectSyncTask projectSyncTask;
+    private final BlackDuckProperties blackDuckProperties;
 
     @Autowired
-    public BlackDuckProvider(final BlackDuckAccumulator accumulatorTask, final ProjectSyncTask projectSyncTask) {
+    public BlackDuckProvider(final BlackDuckAccumulator accumulatorTask, final ProjectSyncTask projectSyncTask, final BlackDuckProperties blackDuckProperties) {
         this.accumulatorTask = accumulatorTask;
         this.projectSyncTask = projectSyncTask;
+        this.blackDuckProperties = blackDuckProperties;
     }
 
     @Override
@@ -63,9 +65,14 @@ public class BlackDuckProvider extends Provider {
     }
 
     @Override
+    public void create() {
+        logger.info("Creating provider...");
+    }
+
+    @Override
     public void update() {
         logger.info("Updating provider...");
-
+        blackDuckProperties.markForUpdate();
     }
 
     @Override

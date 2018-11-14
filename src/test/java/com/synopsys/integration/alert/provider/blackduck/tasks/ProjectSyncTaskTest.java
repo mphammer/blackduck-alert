@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Optional;
 
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
@@ -45,7 +44,7 @@ public class ProjectSyncTaskTest {
         final String groupURL1 = "groupURL1";
         final String groupURL2 = "groupURL2";
 
-        Mockito.when(blackDuckProperties.createRestConnectionAndLogErrors(Mockito.any())).thenReturn(Optional.of(Mockito.mock(BlackduckRestConnection.class)));
+        Mockito.when(blackDuckProperties.createRestConnection(Mockito.any())).thenReturn(Mockito.mock(BlackduckRestConnection.class));
         final HubServicesFactory hubServicesFactory = Mockito.mock(HubServicesFactory.class);
         Mockito.when(blackDuckProperties.createBlackDuckServicesFactory(Mockito.any(), Mockito.any())).thenReturn(hubServicesFactory);
 

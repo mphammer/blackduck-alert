@@ -70,7 +70,7 @@ public class PhoneHomeTask extends ScheduledTask {
     @Override
     public void run() {
         final ExecutorService executorService = Executors.newSingleThreadExecutor();
-        try (final BlackduckRestConnection restConnection = blackDuckProperties.getRestConnection(logger)) {
+        try (final BlackduckRestConnection restConnection = blackDuckProperties.createRestConnection(logger)) {
             final HubServicesFactory hubServicesFactory = blackDuckProperties.createBlackDuckServicesFactory(restConnection, new Slf4jIntLogger(logger));
             // TODO refactor to create a PhoneHomeCallable for alert.  May phone home per provider and channel.
             // TODO convert phone home to not rely on BlackDuck

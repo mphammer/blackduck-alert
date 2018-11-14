@@ -181,7 +181,7 @@ public class BlackDuckAccumulator extends ScheduledTask {
     }
 
     protected Optional<CommonNotificationViewResults> read(final DateRange dateRange) {
-        try (final BlackduckRestConnection restConnection = blackDuckProperties.getRestConnection(logger)) {
+        try (final BlackduckRestConnection restConnection = blackDuckProperties.createRestConnection(logger)) {
             if (restConnection != null) {
                 final HubServicesFactory hubServicesFactory = blackDuckProperties.createBlackDuckServicesFactory(restConnection, new Slf4jIntLogger(logger));
                 final Date startDate = dateRange.getStart();

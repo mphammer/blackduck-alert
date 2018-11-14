@@ -14,15 +14,13 @@ package com.synopsys.integration.alert;
 import java.util.Optional;
 
 import org.mockito.Mockito;
+import org.slf4j.Logger;
 
 import com.synopsys.integration.alert.common.exception.AlertException;
 import com.synopsys.integration.alert.database.provider.blackduck.BlackDuckEntity;
 import com.synopsys.integration.alert.database.provider.blackduck.GlobalBlackDuckRepository;
 import com.synopsys.integration.alert.provider.blackduck.BlackDuckProperties;
-import com.synopsys.integration.blackduck.configuration.HubServerConfig;
 import com.synopsys.integration.blackduck.rest.BlackduckRestConnection;
-import com.synopsys.integration.blackduck.service.HubServicesFactory;
-import com.synopsys.integration.log.IntLogger;
 
 public class TestBlackDuckProperties extends BlackDuckProperties {
     private final TestAlertProperties testAlertProperties;
@@ -71,7 +69,7 @@ public class TestBlackDuckProperties extends BlackDuckProperties {
     }
 
     @Override
-    public Optional<BlackduckRestConnection> createRestConnection(final IntLogger intLogger) throws AlertException {
+    public BlackduckRestConnection createRestConnection(final Logger intLogger) throws AlertException {
         testAlertProperties.setAlertTrustCertificate(true);
         return super.createRestConnection(intLogger);
     }
@@ -80,23 +78,6 @@ public class TestBlackDuckProperties extends BlackDuckProperties {
     public Optional<BlackDuckEntity> getBlackDuckEntity() {
         return Optional.of(new BlackDuckEntity(Integer.valueOf(testProperties.getProperty(TestPropertyKey.TEST_BLACKDUCK_PROVIDER_TIMEOUT)), testProperties.getProperty(TestPropertyKey.TEST_BLACKDUCK_PROVIDER_API_KEY),
             testProperties.getProperty(TestPropertyKey.TEST_BLACKDUCK_PROVIDER_URL)));
-    }
-
-    @Override
-    public HubServerConfig createBlackDuckServerConfig(final IntLogger logger, final int blackDuckTimeout, final String blackDuckUsername, final String blackDuckPassword) throws AlertException {
-        return createHubServerConfigWithCredentials(logger);
-    }
-
-    public HubServerConfig createHubServerConfigWithCredentials(final IntLogger logger) throws NumberFormatException, AlertException {
-        return super.createBlackDuckServerConfig(logger, Integer.valueOf(testProperties.getProperty(TestPropertyKey.TEST_BLACKDUCK_PROVIDER_TIMEOUT)), testProperties.getProperty(TestPropertyKey.TEST_BLACKDUCK_PROVIDER_USERNAME),
-            testProperties.getProperty(TestPropertyKey.TEST_BLACKDUCK_PROVIDER_PASSWORD));
-    }
-
-    public HubServicesFactory createHubServicesFactoryWithCredential(final IntLogger logger) throws Exception {
-        testAlertProperties.setAlertTrustCertificate(true);
-        final HubServerConfig blackDuckServerConfig = createHubServerConfigWithCredentials(logger);
-        final BlackduckRestConnection restConnection = blackDuckServerConfig.createCredentialsRestConnection(logger);
-        return new HubServicesFactory(HubServicesFactory.createDefaultGson(), HubServicesFactory.createDefaultJsonParser(), restConnection, logger);
     }
 
 }

@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.synopsys.integration.alert.common.ContentConverter;
 import com.synopsys.integration.alert.common.descriptor.DescriptorMap;
+import com.synopsys.integration.alert.common.descriptor.ProviderDescriptor;
 import com.synopsys.integration.alert.common.descriptor.config.DescriptorActionApi;
 import com.synopsys.integration.alert.common.enumeration.ActionApiType;
 import com.synopsys.integration.alert.web.config.actions.SingleEntityConfigActions;
@@ -60,14 +61,18 @@ public class ProviderConfigController extends ConfigController {
 
     @Override
     public ResponseEntity<String> postConfig(@RequestBody(required = false) final String restModel, @PathVariable final String descriptorName) {
-        final DescriptorActionApi providerDescriptor = descriptorMap.getProviderDescriptor(descriptorName).getRestApi(ActionApiType.PROVIDER_CONFIG);
-        return configControllerHandler.postConfig(providerDescriptor.getConfigFromJson(restModel), providerDescriptor);
+        final ProviderDescriptor providerDescriptor = descriptorMap.getProviderDescriptor(descriptorName);
+        final DescriptorActionApi descriptorActionApi = providerDescriptor.getRestApi(ActionApiType.PROVIDER_CONFIG);
+        providerDescriptor.getProvider().create();
+        return configControllerHandler.postConfig(descriptorActionApi.getConfigFromJson(restModel), descriptorActionApi);
     }
 
     @Override
     public ResponseEntity<String> putConfig(@RequestBody(required = false) final String restModel, @PathVariable final String descriptorName) {
-        final DescriptorActionApi providerDescriptor = descriptorMap.getProviderDescriptor(descriptorName).getRestApi(ActionApiType.PROVIDER_CONFIG);
-        return configControllerHandler.putConfig(providerDescriptor.getConfigFromJson(restModel), providerDescriptor);
+        final ProviderDescriptor providerDescriptor = descriptorMap.getProviderDescriptor(descriptorName);
+        final DescriptorActionApi descriptorActionApi = providerDescriptor.getRestApi(ActionApiType.PROVIDER_CONFIG);
+        providerDescriptor.getProvider().update();
+        return configControllerHandler.putConfig(descriptorActionApi.getConfigFromJson(restModel), descriptorActionApi);
     }
 
     @Override
@@ -78,8 +83,10 @@ public class ProviderConfigController extends ConfigController {
 
     @Override
     public ResponseEntity<String> deleteConfig(final Long id, @PathVariable final String descriptorName) {
-        final DescriptorActionApi providerDescriptor = descriptorMap.getProviderDescriptor(descriptorName).getRestApi(ActionApiType.PROVIDER_CONFIG);
-        return configControllerHandler.deleteConfig(id, providerDescriptor);
+        final ProviderDescriptor providerDescriptor = descriptorMap.getProviderDescriptor(descriptorName);
+        final DescriptorActionApi descriptorActionApi = providerDescriptor.getRestApi(ActionApiType.PROVIDER_CONFIG);
+        providerDescriptor.getProvider().destroy();
+        return configControllerHandler.deleteConfig(id, descriptorActionApi);
     }
 
     @Override

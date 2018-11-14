@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import com.synopsys.integration.alert.common.workflow.processor.MessageContentCollector;
+import com.synopsys.integration.alert.provider.blackduck.BlackDuckProperties;
 import com.synopsys.integration.alert.provider.blackduck.BlackDuckProvider;
 import com.synopsys.integration.alert.provider.blackduck.collector.BlackDuckPolicyMessageContentCollector;
 import com.synopsys.integration.alert.provider.blackduck.collector.BlackDuckVulnerabilityMessageContentCollector;
@@ -33,7 +34,8 @@ public class BlackDuckDescriptorTest {
     public void testGetNotificationTypes() {
         final BlackDuckAccumulator accumulatorTask = Mockito.mock(BlackDuckAccumulator.class);
         final ProjectSyncTask projectSyncTask = Mockito.mock(ProjectSyncTask.class);
-        final BlackDuckProvider provider = new BlackDuckProvider(accumulatorTask, projectSyncTask);
+        final BlackDuckProperties blackDuckProperties = Mockito.mock(BlackDuckProperties.class);
+        final BlackDuckProvider provider = new BlackDuckProvider(accumulatorTask, projectSyncTask, blackDuckProperties);
         final BlackDuckDescriptor descriptor = new BlackDuckDescriptor(null, null, null, null, provider, null);
         final Set<String> expectedNotificationTypes = new LinkedHashSet<>();
         expectedNotificationTypes.add(NotificationType.POLICY_OVERRIDE.name());
@@ -49,7 +51,8 @@ public class BlackDuckDescriptorTest {
     public void testCreateTopicCollectors() {
         final BlackDuckAccumulator accumulatorTask = Mockito.mock(BlackDuckAccumulator.class);
         final ProjectSyncTask projectSyncTask = Mockito.mock(ProjectSyncTask.class);
-        final BlackDuckProvider provider = new BlackDuckProvider(accumulatorTask, projectSyncTask);
+        final BlackDuckProperties blackDuckProperties = Mockito.mock(BlackDuckProperties.class);
+        final BlackDuckProvider provider = new BlackDuckProvider(accumulatorTask, projectSyncTask, blackDuckProperties);
         final BlackDuckTopicCollectorFactory topicCollectorFactory = Mockito.mock(BlackDuckTopicCollectorFactory.class);
         final List<MessageContentCollector> collectorList = Arrays.asList(Mockito.mock(BlackDuckVulnerabilityMessageContentCollector.class), Mockito.mock(BlackDuckPolicyMessageContentCollector.class));
         final Set<MessageContentCollector> expectedCollectorSet = new HashSet<>(collectorList);
