@@ -21,15 +21,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.alert.common.field;
+package com.synopsys.integration.alert.database.system;
 
-import java.lang.reflect.Type;
+import java.util.Date;
 import java.util.List;
 
-import com.synopsys.integration.alert.common.enumeration.FieldContentIdentifier;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
-public class ObjectHierarchicalField extends HierarchicalField {
-    public ObjectHierarchicalField(final List<String> pathToField, final String innerMostFieldName, final FieldContentIdentifier contentIdentifier, final String label, final Type type) {
-        super(pathToField, innerMostFieldName, contentIdentifier, label, type);
-    }
+public interface SystemMessageRepository extends JpaRepository<SystemMessage, Long> {
+    @Query("SELECT message FROM SystemMessage message WHERE message.created >= ?1 AND message.created < ?2 ORDER BY created_at asc")
+    List<SystemMessage> findByCreatedBetween(final Date start, final Date end);
+
+    SystemMessage findTopByOrderByCreatedAsc();
+
 }

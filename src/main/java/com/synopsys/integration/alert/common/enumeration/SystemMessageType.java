@@ -21,32 +21,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.alert.common.field;
+package com.synopsys.integration.alert.common.enumeration;
 
-import com.synopsys.integration.util.Stringable;
-
-public abstract class Field extends Stringable {
-    private String fieldKey;
-    private String label;
-
-    public Field(final String fieldKey, final String label) {
-        this.fieldKey = fieldKey;
-        this.label = label;
-    }
-
-    public String getFieldKey() {
-        return fieldKey;
-    }
-
-    public void setFieldKey(final String fieldKey) {
-        this.fieldKey = fieldKey;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(final String label) {
-        this.label = label;
-    }
+public enum SystemMessageType {
+    INFO,
+    ERROR,
+    WARNING;
 }
