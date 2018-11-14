@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
 
 import com.synopsys.integration.alert.common.descriptor.config.StartupComponent;
 import com.synopsys.integration.alert.database.entity.EntityPropertyMapper;
-import com.synopsys.integration.alert.database.provider.blackduck.GlobalBlackDuckConfigEntity;
+import com.synopsys.integration.alert.database.provider.blackduck.BlackDuckEntity;
 import com.synopsys.integration.alert.provider.blackduck.BlackDuckProvider;
 import com.synopsys.integration.alert.web.provider.blackduck.BlackDuckConfig;
 import com.synopsys.integration.alert.workflow.startup.AlertStartupProperty;
@@ -50,7 +50,7 @@ public class BlackDuckProviderStartupComponent extends StartupComponent {
     @Override
     public Map<String, AlertStartupProperty> getGlobalEntityPropertyMapping() {
         final Set<String> overrideFields = Collections.singleton("blackDuckUrl");
-        return entityPropertyMapper.mapEntityToProperties(BlackDuckProvider.COMPONENT_NAME, GlobalBlackDuckConfigEntity.class, overrideFields);
+        return entityPropertyMapper.mapEntityToProperties(BlackDuckProvider.COMPONENT_NAME, BlackDuckEntity.class, overrideFields);
     }
 
 }

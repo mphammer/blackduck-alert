@@ -12,12 +12,12 @@
 package com.synopsys.integration.alert.provider.blackduck.mock;
 
 import com.google.gson.JsonObject;
-import com.synopsys.integration.alert.database.provider.blackduck.GlobalBlackDuckConfigEntity;
+import com.synopsys.integration.alert.database.provider.blackduck.BlackDuckEntity;
 import com.synopsys.integration.alert.mock.MockGlobalEntityUtil;
 import com.synopsys.integration.alert.web.model.Config;
 import com.synopsys.integration.alert.web.provider.blackduck.BlackDuckConfig;
 
-public class MockGlobalBlackDuckEntity extends MockGlobalEntityUtil<GlobalBlackDuckConfigEntity> {
+public class MockGlobalBlackDuckEntity extends MockGlobalEntityUtil<BlackDuckEntity> {
     private Integer blackDuckTimeout;
     private String blackDuckApiKey;
     private String blackDuckUrl;
@@ -80,15 +80,15 @@ public class MockGlobalBlackDuckEntity extends MockGlobalEntityUtil<GlobalBlackD
     }
 
     @Override
-    public GlobalBlackDuckConfigEntity createGlobalEntity() {
-        final GlobalBlackDuckConfigEntity entity = new GlobalBlackDuckConfigEntity(Integer.valueOf(blackDuckTimeout), blackDuckApiKey, blackDuckUrl);
+    public BlackDuckEntity createGlobalEntity() {
+        final BlackDuckEntity entity = new BlackDuckEntity(Integer.valueOf(blackDuckTimeout), blackDuckApiKey, blackDuckUrl);
         entity.setId(id);
         return entity;
     }
 
     @Override
-    public GlobalBlackDuckConfigEntity createEmptyGlobalEntity() {
-        return new GlobalBlackDuckConfigEntity();
+    public BlackDuckEntity createEmptyGlobalEntity() {
+        return new BlackDuckEntity();
     }
 
     @Override

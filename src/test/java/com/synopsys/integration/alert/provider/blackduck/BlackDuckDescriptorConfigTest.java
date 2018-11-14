@@ -12,7 +12,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import com.synopsys.integration.alert.database.entity.DatabaseEntity;
-import com.synopsys.integration.alert.database.provider.blackduck.GlobalBlackDuckConfigEntity;
+import com.synopsys.integration.alert.database.provider.blackduck.BlackDuckEntity;
 import com.synopsys.integration.alert.database.provider.blackduck.GlobalBlackDuckRepository;
 import com.synopsys.integration.alert.provider.blackduck.descriptor.BlackDuckProviderDescriptorActionApi;
 import com.synopsys.integration.alert.provider.blackduck.descriptor.BlackDuckRepositoryAccessor;
@@ -29,7 +29,7 @@ public class BlackDuckDescriptorConfigTest {
 
     @Test
     public void testRepositoryCalls() {
-        final GlobalBlackDuckConfigEntity entity = mockBlackDuckEntity.createGlobalEntity();
+        final BlackDuckEntity entity = mockBlackDuckEntity.createGlobalEntity();
 
         final GlobalBlackDuckRepository globalBlackDuckRepository = Mockito.mock(GlobalBlackDuckRepository.class);
         Mockito.when(globalBlackDuckRepository.findAll()).thenReturn(Arrays.asList(entity));

@@ -85,7 +85,7 @@ public class BlackDuckAccumulator extends ScheduledTask {
         if (StringUtils.isNotBlank(alertProperties.getAlertConfigHome())) {
             accumulatorFileDirectory = String.format("%s/data", alertProperties.getAlertConfigHome());
         }
-        this.searchRangeFilePath = new File(accumulatorFileDirectory, accumulatorFileName);
+        searchRangeFilePath = new File(accumulatorFileDirectory, accumulatorFileName);
     }
 
     public File getSearchRangeFilePath() {
@@ -181,32 +181,29 @@ public class BlackDuckAccumulator extends ScheduledTask {
     }
 
     protected Optional<CommonNotificationViewResults> read(final DateRange dateRange) {
-        final Optional<BlackduckRestConnection> optionalConnection = blackDuckProperties.createRestConnectionAndLogErrors(logger);
-        if (optionalConnection.isPresent()) {
-            try (final BlackduckRestConnection restConnection = optionalConnection.get()) {
-                if (restConnection != null) {
-                    final HubServicesFactory hubServicesFactory = blackDuckProperties.createBlackDuckServicesFactory(restConnection, new Slf4jIntLogger(logger));
-                    final Date startDate = dateRange.getStart();
-                    final Date endDate = dateRange.getEnd();
-                    logger.info("Accumulating Notifications Between {} and {} ", RestConstants.formatDate(startDate), RestConstants.formatDate(endDate));
-                    final NotificationService notificationService = hubServicesFactory.createNotificationService();
-                    final NotificationContentDetailFactory notificationContentDetailFactory = new NotificationContentDetailFactory(hubServicesFactory.getGson(), HubServicesFactory.createDefaultJsonParser());
-                    final CommonNotificationService commonNotificationService = hubServicesFactory.createCommonNotificationService(notificationContentDetailFactory, true);
-                    // TODO change this code to only use the notification audit and return a different type.  No longer
-                    final List<NotificationView> notificationViewList = notificationService.getAllNotifications(startDate, endDate);
-                    final List<CommonNotificationView> commonNotificationViews = commonNotificationService.getCommonNotifications(notificationViewList);
-                    final CommonNotificationViewResults notificationResults = commonNotificationService.getCommonNotificationViewResults(commonNotificationViews);
+        try (final BlackduckRestConnection restConnection = blackDuckProperties.getRestConnection(logger)) {
+            if (restConnection != null) {
+                final HubServicesFactory hubServicesFactory = blackDuckProperties.createBlackDuckServicesFactory(restConnection, new Slf4jIntLogger(logger));
+                final Date startDate = dateRange.getStart();
+                final Date endDate = dateRange.getEnd();
+                logger.info("Accumulating Notifications Between {} and {} ", RestConstants.formatDate(startDate), RestConstants.formatDate(endDate));
+                final NotificationService notificationService = hubServicesFactory.createNotificationService();
+                final NotificationContentDetailFactory notificationContentDetailFactory = new NotificationContentDetailFactory(hubServicesFactory.getGson(), HubServicesFactory.createDefaultJsonParser());
+                final CommonNotificationService commonNotificationService = hubServicesFactory.createCommonNotificationService(notificationContentDetailFactory, true);
+                // TODO change this code to only use the notification audit and return a different type.  No longer
+                final List<NotificationView> notificationViewList = notificationService.getAllNotifications(startDate, endDate);
+                final List<CommonNotificationView> commonNotificationViews = commonNotificationService.getCommonNotifications(notificationViewList);
+                final CommonNotificationViewResults notificationResults = commonNotificationService.getCommonNotificationViewResults(commonNotificationViews);
 
-                    if (notificationResults.isEmpty()) {
-                        logger.debug("Read Notification Count: 0");
-                        return Optional.empty();
-                    }
-                    logger.debug("Read Notification Count: {}", notificationResults.getResults().size());
-                    return Optional.of(notificationResults);
+                if (notificationResults.isEmpty()) {
+                    logger.debug("Read Notification Count: 0");
+                    return Optional.empty();
                 }
-            } catch (final Exception ex) {
-                logger.error("Error Reading notifications", ex);
+                logger.debug("Read Notification Count: {}", notificationResults.getResults().size());
+                return Optional.of(notificationResults);
             }
+        } catch (final Exception ex) {
+            logger.error("Error Reading notifications", ex);
         }
         return Optional.empty();
     }

@@ -34,7 +34,7 @@ import org.springframework.stereotype.Component;
 
 import com.synopsys.integration.alert.common.AlertProperties;
 import com.synopsys.integration.alert.common.exception.AlertException;
-import com.synopsys.integration.alert.database.provider.blackduck.GlobalBlackDuckConfigEntity;
+import com.synopsys.integration.alert.database.provider.blackduck.BlackDuckEntity;
 import com.synopsys.integration.alert.database.provider.blackduck.GlobalBlackDuckRepository;
 import com.synopsys.integration.blackduck.configuration.HubServerConfig;
 import com.synopsys.integration.blackduck.configuration.HubServerConfigBuilder;
@@ -49,6 +49,10 @@ public class BlackDuckProperties {
     public static final int DEFAULT_TIMEOUT = 300;
     private final GlobalBlackDuckRepository globalBlackDuckRepository;
     private final AlertProperties alertProperties;
+
+    private boolean needsUpdate;
+    private HubServerConfig hubServerConfig;
+    private BlackduckRestConnection restConnection;
 
     // the blackduck product hasn't renamed their environment variables from hub to blackduck
     // need to keep hub in the name until
@@ -65,9 +69,9 @@ public class BlackDuckProperties {
     }
 
     public Optional<String> getBlackDuckUrl() {
-        final Optional<GlobalBlackDuckConfigEntity> optionalGlobalBlackDuckConfigEntity = getBlackDuckConfig();
+        final Optional<BlackDuckEntity> optionalGlobalBlackDuckConfigEntity = getBlackDuckEntity();
         if (optionalGlobalBlackDuckConfigEntity.isPresent()) {
-            final GlobalBlackDuckConfigEntity blackDuckConfigEntity = optionalGlobalBlackDuckConfigEntity.get();
+            final BlackDuckEntity blackDuckConfigEntity = optionalGlobalBlackDuckConfigEntity.get();
             if (StringUtils.isBlank(blackDuckConfigEntity.getBlackDuckUrl())) {
                 return Optional.empty();
             } else {
@@ -93,9 +97,9 @@ public class BlackDuckProperties {
     }
 
     public Integer getBlackDuckTimeout() {
-        final Optional<GlobalBlackDuckConfigEntity> optionalGlobalBlackDuckConfigEntity = getBlackDuckConfig();
+        final Optional<BlackDuckEntity> optionalGlobalBlackDuckConfigEntity = getBlackDuckEntity();
         if (optionalGlobalBlackDuckConfigEntity.isPresent()) {
-            final GlobalBlackDuckConfigEntity blackDuckConfigEntity = optionalGlobalBlackDuckConfigEntity.get();
+            final BlackDuckEntity blackDuckConfigEntity = optionalGlobalBlackDuckConfigEntity.get();
             if (blackDuckConfigEntity.getBlackDuckTimeout() == null) {
                 return DEFAULT_TIMEOUT;
             } else {
@@ -105,8 +109,8 @@ public class BlackDuckProperties {
         return DEFAULT_TIMEOUT;
     }
 
-    public Optional<GlobalBlackDuckConfigEntity> getBlackDuckConfig() {
-        final List<GlobalBlackDuckConfigEntity> configs = globalBlackDuckRepository.findAll();
+    public Optional<BlackDuckEntity> getBlackDuckEntity() {
+        final List<BlackDuckEntity> configs = globalBlackDuckRepository.findAll();
         if (configs != null && !configs.isEmpty()) {
             return Optional.of(configs.get(0));
         }
@@ -117,70 +121,80 @@ public class BlackDuckProperties {
         return new HubServicesFactory(HubServicesFactory.createDefaultGson(), HubServicesFactory.createDefaultJsonParser(), restConnection, logger);
     }
 
-    public Optional<BlackduckRestConnection> createRestConnectionAndLogErrors(final Logger logger) {
+    public BlackduckRestConnection getRestConnection(final Logger logger) throws AlertException {
+        if (null == restConnection || needsUpdate) {
+            final IntLogger intLogger = new Slf4jIntLogger(logger);
+            final HubServerConfig foundHubServerConfig = getHubServerConfig(intLogger);
+            final Optional<BlackduckRestConnection> optionalBlackDuckRestConnection = createRestConnectionAndLogErrors(intLogger, foundHubServerConfig);
+            if (!optionalBlackDuckRestConnection.isPresent()) {
+                resetConnections();
+                throw new AlertException("Black Duck connection could not be established.");
+            } else {
+                restConnection = optionalBlackDuckRestConnection.get();
+            }
+        }
+
+        return restConnection;
+    }
+
+    public HubServerConfig getHubServerConfig(final IntLogger intLogger) throws AlertException {
+        if (null == hubServerConfig || needsUpdate) {
+            final Optional<HubServerConfig> optionalHubServerConfig = createBlackDuckServerConfig(intLogger);
+            if (!optionalHubServerConfig.isPresent()) {
+                resetConnections();
+                throw new AlertException("Server configuration is missing.");
+            } else {
+                setHubServerConfig(optionalHubServerConfig.get());
+            }
+        }
+
+        return hubServerConfig;
+    }
+
+    public void markForUpdate() {
+        needsUpdate = true;
+    }
+
+    private void setHubServerConfig(final HubServerConfig hubServerConfig) {
+        this.hubServerConfig = hubServerConfig;
+        restConnection = null;
+        needsUpdate = false;
+    }
+
+    private void resetConnections() {
+        restConnection = null;
+        hubServerConfig = null;
+        markForUpdate();
+    }
+
+    private Optional<BlackduckRestConnection> createRestConnectionAndLogErrors(final IntLogger logger, final HubServerConfig hubServerConfig) {
         try {
-            return createRestConnection(logger);
+            return Optional.of(hubServerConfig.createRestConnection(logger));
+        } catch (final EncryptionException e) {
+            logger.error(e.getMessage(), e);
         } catch (final Exception e) {
             logger.error(e.getMessage(), e);
         }
         return Optional.empty();
     }
 
-    public Optional<BlackduckRestConnection> createRestConnection(final Logger logger) throws AlertException {
-        final IntLogger intLogger = new Slf4jIntLogger(logger);
-        return createRestConnection(intLogger);
-    }
-
-    public Optional<BlackduckRestConnection> createRestConnection(final IntLogger intLogger) throws AlertException {
-        final Optional<HubServerConfig> blackDuckServerConfig = createBlackDuckServerConfig(intLogger);
-        if (blackDuckServerConfig.isPresent()) {
-            return createRestConnection(intLogger, blackDuckServerConfig.get());
-        }
-        return Optional.empty();
-    }
-
-    public Optional<BlackduckRestConnection> createRestConnection(final IntLogger intLogger, final HubServerConfig blackDuckServerConfig) {
-        try {
-            return Optional.of(blackDuckServerConfig.createRestConnection(intLogger));
-        } catch (final EncryptionException e) {
-            intLogger.error(e.getMessage(), e);
-        }
-        return Optional.empty();
-    }
-
-    public Optional<HubServerConfig> createBlackDuckServerConfig(final IntLogger logger) throws AlertException {
-        final Optional<GlobalBlackDuckConfigEntity> optionalGlobalBlackDuckConfigEntity = getBlackDuckConfig();
+    private Optional<HubServerConfig> createBlackDuckServerConfig(final IntLogger logger) throws AlertException {
+        final Optional<BlackDuckEntity> optionalGlobalBlackDuckConfigEntity = getBlackDuckEntity();
         if (optionalGlobalBlackDuckConfigEntity.isPresent()) {
-            final GlobalBlackDuckConfigEntity globalHubConfigEntity = optionalGlobalBlackDuckConfigEntity.get();
+            final BlackDuckEntity globalHubConfigEntity = optionalGlobalBlackDuckConfigEntity.get();
             if (globalHubConfigEntity.getBlackDuckTimeout() == null || globalHubConfigEntity.getBlackDuckApiKey() == null) {
                 throw new AlertException("Global config settings can not be null.");
             }
-            return Optional.of(createBlackDuckServerConfig(logger, globalHubConfigEntity.getBlackDuckTimeout(), globalHubConfigEntity.getBlackDuckApiKey()));
+            final HubServerConfigBuilder blackDuckServerConfigBuilder = createServerConfigBuilderWithoutAuthentication(logger, globalHubConfigEntity.getBlackDuckTimeout());
+            blackDuckServerConfigBuilder.setApiToken(globalHubConfigEntity.getBlackDuckApiKey());
+
+            try {
+                return Optional.of(blackDuckServerConfigBuilder.build());
+            } catch (final IllegalStateException e) {
+                throw new AlertException(e.getMessage(), e);
+            }
         }
         return Optional.empty();
-    }
-
-    public HubServerConfig createBlackDuckServerConfig(final IntLogger logger, final int blackDuckTimeout, final String blackDuckApiToken) throws AlertException {
-        final HubServerConfigBuilder blackDuckServerConfigBuilder = createServerConfigBuilderWithoutAuthentication(logger, blackDuckTimeout);
-        blackDuckServerConfigBuilder.setApiToken(blackDuckApiToken);
-
-        try {
-            return blackDuckServerConfigBuilder.build();
-        } catch (final IllegalStateException e) {
-            throw new AlertException(e.getMessage(), e);
-        }
-    }
-
-    public HubServerConfig createBlackDuckServerConfig(final IntLogger logger, final int blackDuckTimeout, final String blackDuckUsername, final String blackDuckPassword) throws AlertException {
-        final HubServerConfigBuilder blackDuckServerConfigBuilder = createServerConfigBuilderWithoutAuthentication(logger, blackDuckTimeout);
-        blackDuckServerConfigBuilder.setUsername(blackDuckUsername);
-        blackDuckServerConfigBuilder.setPassword(blackDuckPassword);
-
-        try {
-            return blackDuckServerConfigBuilder.build();
-        } catch (final IllegalStateException e) {
-            throw new AlertException(e.getMessage(), e);
-        }
     }
 
     public HubServerConfigBuilder createServerConfigBuilderWithoutAuthentication(final IntLogger logger, final int blackDuckTimeout) {

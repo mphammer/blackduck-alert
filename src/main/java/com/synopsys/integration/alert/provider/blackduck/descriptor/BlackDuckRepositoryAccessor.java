@@ -26,10 +26,10 @@ package com.synopsys.integration.alert.provider.blackduck.descriptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.synopsys.integration.alert.database.provider.blackduck.GlobalBlackDuckConfigEntity;
-import com.synopsys.integration.alert.database.provider.blackduck.GlobalBlackDuckRepository;
 import com.synopsys.integration.alert.database.RepositoryAccessor;
 import com.synopsys.integration.alert.database.entity.DatabaseEntity;
+import com.synopsys.integration.alert.database.provider.blackduck.BlackDuckEntity;
+import com.synopsys.integration.alert.database.provider.blackduck.GlobalBlackDuckRepository;
 
 @Component
 public class BlackDuckRepositoryAccessor extends RepositoryAccessor {
@@ -43,7 +43,7 @@ public class BlackDuckRepositoryAccessor extends RepositoryAccessor {
 
     @Override
     public DatabaseEntity saveEntity(final DatabaseEntity entity) {
-        final GlobalBlackDuckConfigEntity blackDuckEntity = (GlobalBlackDuckConfigEntity) entity;
+        final BlackDuckEntity blackDuckEntity = (BlackDuckEntity) entity;
         return repository.save(blackDuckEntity);
     }
 

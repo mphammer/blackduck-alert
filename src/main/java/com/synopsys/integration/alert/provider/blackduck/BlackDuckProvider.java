@@ -63,6 +63,12 @@ public class BlackDuckProvider extends Provider {
     }
 
     @Override
+    public void update() {
+        logger.info("Updating provider...");
+
+    }
+
+    @Override
     public void destroy() {
         logger.info("Destroying provider...");
         accumulatorTask.scheduleExecution(BlackDuckAccumulator.STOP_SCHEDULE_EXPRESSION);

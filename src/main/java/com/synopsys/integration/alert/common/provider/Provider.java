@@ -31,6 +31,8 @@ public abstract class Provider {
 
     public abstract void initialize();
 
+    public abstract void update();
+
     public abstract void destroy();
 
     public abstract String getName();

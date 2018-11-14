@@ -16,7 +16,7 @@ import java.util.Optional;
 import org.mockito.Mockito;
 
 import com.synopsys.integration.alert.common.exception.AlertException;
-import com.synopsys.integration.alert.database.provider.blackduck.GlobalBlackDuckConfigEntity;
+import com.synopsys.integration.alert.database.provider.blackduck.BlackDuckEntity;
 import com.synopsys.integration.alert.database.provider.blackduck.GlobalBlackDuckRepository;
 import com.synopsys.integration.alert.provider.blackduck.BlackDuckProperties;
 import com.synopsys.integration.blackduck.configuration.HubServerConfig;
@@ -42,7 +42,7 @@ public class TestBlackDuckProperties extends BlackDuckProperties {
     public TestBlackDuckProperties(final GlobalBlackDuckRepository globalHubRepository, final TestAlertProperties alertProperties, final Integer blackDuckTimeout) {
         super(globalHubRepository, alertProperties);
         this.blackDuckTimeout = blackDuckTimeout;
-        this.testAlertProperties = alertProperties;
+        testAlertProperties = alertProperties;
         testProperties = new TestProperties();
         setHubTimeout(Integer.valueOf(testProperties.getProperty(TestPropertyKey.TEST_BLACKDUCK_PROVIDER_TIMEOUT)));
         testAlertProperties.setAlertTrustCertificate(Boolean.valueOf(testProperties.getProperty(TestPropertyKey.TEST_BLACKDUCK_PROVIDER_TRUST_HTTPS_CERT)));
@@ -77,8 +77,8 @@ public class TestBlackDuckProperties extends BlackDuckProperties {
     }
 
     @Override
-    public Optional<GlobalBlackDuckConfigEntity> getBlackDuckConfig() {
-        return Optional.of(new GlobalBlackDuckConfigEntity(Integer.valueOf(testProperties.getProperty(TestPropertyKey.TEST_BLACKDUCK_PROVIDER_TIMEOUT)), testProperties.getProperty(TestPropertyKey.TEST_BLACKDUCK_PROVIDER_API_KEY),
+    public Optional<BlackDuckEntity> getBlackDuckEntity() {
+        return Optional.of(new BlackDuckEntity(Integer.valueOf(testProperties.getProperty(TestPropertyKey.TEST_BLACKDUCK_PROVIDER_TIMEOUT)), testProperties.getProperty(TestPropertyKey.TEST_BLACKDUCK_PROVIDER_API_KEY),
             testProperties.getProperty(TestPropertyKey.TEST_BLACKDUCK_PROVIDER_URL)));
     }
 

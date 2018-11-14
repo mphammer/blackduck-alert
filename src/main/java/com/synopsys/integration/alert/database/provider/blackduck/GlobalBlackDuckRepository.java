@@ -25,6 +25,6 @@ package com.synopsys.integration.alert.database.provider.blackduck;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface GlobalBlackDuckRepository extends JpaRepository<GlobalBlackDuckConfigEntity, Long> {
+public interface GlobalBlackDuckRepository extends JpaRepository<BlackDuckEntity, Long> {
 
 }

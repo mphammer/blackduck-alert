@@ -23,7 +23,7 @@ import com.synopsys.integration.alert.common.model.AggregateMessageContent;
 import com.synopsys.integration.alert.common.model.LinkableItem;
 import com.synopsys.integration.alert.database.audit.AuditUtility;
 import com.synopsys.integration.alert.database.channel.email.EmailGlobalConfigEntity;
-import com.synopsys.integration.alert.database.provider.blackduck.GlobalBlackDuckConfigEntity;
+import com.synopsys.integration.alert.database.provider.blackduck.BlackDuckEntity;
 import com.synopsys.integration.alert.database.provider.blackduck.GlobalBlackDuckRepository;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.RestConstants;
@@ -37,7 +37,7 @@ public class EmailChannelTestIT extends ChannelTest {
         final AuditUtility auditUtility = Mockito.mock(AuditUtility.class);
         final GlobalBlackDuckRepository globalRepository = Mockito.mock(GlobalBlackDuckRepository.class);
 
-        final GlobalBlackDuckConfigEntity globalConfig = new GlobalBlackDuckConfigEntity(300, properties.getProperty(TestPropertyKey.TEST_BLACKDUCK_PROVIDER_API_KEY), properties.getProperty(TestPropertyKey.TEST_BLACKDUCK_PROVIDER_URL));
+        final BlackDuckEntity globalConfig = new BlackDuckEntity(300, properties.getProperty(TestPropertyKey.TEST_BLACKDUCK_PROVIDER_API_KEY), properties.getProperty(TestPropertyKey.TEST_BLACKDUCK_PROVIDER_URL));
         Mockito.when(globalRepository.findAll()).thenReturn(Arrays.asList(globalConfig));
 
         final TestAlertProperties testAlertProperties = new TestAlertProperties();

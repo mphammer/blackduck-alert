@@ -23,17 +23,20 @@
  */
 package com.synopsys.integration.alert.common.descriptor;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.validation.constraints.NotNull;
 
 import com.synopsys.integration.alert.common.descriptor.config.DescriptorActionApi;
 import com.synopsys.integration.alert.common.descriptor.config.UIConfig;
+import com.synopsys.integration.alert.common.enumeration.ActionApiType;
 import com.synopsys.integration.alert.common.enumeration.DescriptorType;
 import com.synopsys.integration.alert.common.provider.Provider;
 import com.synopsys.integration.alert.common.provider.ProviderContentType;
 import com.synopsys.integration.alert.common.provider.ProviderUIConfig;
 import com.synopsys.integration.alert.common.workflow.processor.MessageContentCollector;
+import com.synopsys.integration.alert.database.entity.DatabaseEntity;
 
 public abstract class ProviderDescriptor extends Descriptor {
     private final Provider provider;
@@ -52,6 +55,20 @@ public abstract class ProviderDescriptor extends Descriptor {
 
     public Set<ProviderContentType> getProviderContentTypes() {
         return getProvider().getProviderContentTypes();
+    }
+
+    public DatabaseEntity getProviderEntity() throws IllegalStateException {
+        final List<? extends DatabaseEntity> entities = readEntities(ActionApiType.PROVIDER_CONFIG);
+
+        if (entities.size() > 1) {
+            throw new IllegalStateException("There Should not be more than 1 entity in the provider database.");
+        }
+
+        if (entities.size() == 1) {
+            return entities.get(0);
+        }
+
+        return null;
     }
 
     public abstract Set<MessageContentCollector> createTopicCollectors();

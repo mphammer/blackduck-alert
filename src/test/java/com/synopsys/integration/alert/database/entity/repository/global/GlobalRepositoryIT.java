@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.synopsys.integration.alert.Application;
 import com.synopsys.integration.alert.database.DatabaseDataSource;
-import com.synopsys.integration.alert.database.provider.blackduck.GlobalBlackDuckConfigEntity;
+import com.synopsys.integration.alert.database.provider.blackduck.BlackDuckEntity;
 import com.synopsys.integration.alert.database.provider.blackduck.GlobalBlackDuckRepository;
 import com.synopsys.integration.test.annotation.DatabaseConnectionTest;
 
@@ -42,11 +42,11 @@ public class GlobalRepositoryIT {
         final Integer hubTimeout = 300;
         final String hubApiKey = "hub_api_key";
         final String hubUrl = "hub_url";
-        final GlobalBlackDuckConfigEntity entity = new GlobalBlackDuckConfigEntity(hubTimeout, hubApiKey, hubUrl);
-        final GlobalBlackDuckConfigEntity savedEntity = repository.save(entity);
+        final BlackDuckEntity entity = new BlackDuckEntity(hubTimeout, hubApiKey, hubUrl);
+        final BlackDuckEntity savedEntity = repository.save(entity);
         final long count = repository.count();
         assertEquals(1, count);
-        final Optional<GlobalBlackDuckConfigEntity> foundEntity = repository.findById(savedEntity.getId());
+        final Optional<BlackDuckEntity> foundEntity = repository.findById(savedEntity.getId());
         assertEquals(hubTimeout, foundEntity.get().getBlackDuckTimeout());
         assertEquals(hubApiKey, foundEntity.get().getBlackDuckApiKey());
         assertEquals(hubUrl, foundEntity.get().getBlackDuckUrl());

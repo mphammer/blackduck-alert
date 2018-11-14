@@ -43,7 +43,7 @@ import com.synopsys.integration.alert.common.AlertProperties;
 import com.synopsys.integration.alert.common.descriptor.ProviderDescriptor;
 import com.synopsys.integration.alert.common.provider.Provider;
 import com.synopsys.integration.alert.database.entity.NotificationContent;
-import com.synopsys.integration.alert.database.provider.blackduck.GlobalBlackDuckConfigEntity;
+import com.synopsys.integration.alert.database.provider.blackduck.BlackDuckEntity;
 import com.synopsys.integration.alert.database.purge.PurgeProcessor;
 import com.synopsys.integration.alert.database.purge.PurgeReader;
 import com.synopsys.integration.alert.database.purge.PurgeWriter;
@@ -73,36 +73,26 @@ public class StartupManager {
     private final PhoneHomeTask phoneHomeTask;
     private final AlertStartupInitializer alertStartupInitializer;
     private final List<ProviderDescriptor> providerDescriptorList;
-
+    private final StringEncryptionConverter stringEncryptionConverter;
     @Value("${logging.level.com.blackducksoftware.integration:}")
     private String loggingLevel;
-
     // SSL properties
     @Value("${server.port:")
     private String serverPort;
-
     @Value("${server.ssl.key-store:}")
     private String keyStoreFile;
-
     @Value("${server.ssl.key-store-password:}")
     private String keyStorePass;
-
     @Value("${server.ssl.keyStoreType:}")
     private String keyStoreType;
-
     @Value("${server.ssl.keyAlias:}")
     private String keyAlias;
-
     @Value("${server.ssl.trust-store:}")
     private String trustStoreFile;
-
     @Value("${server.ssl.trust-store-password:}")
     private String trustStorePass;
-
     @Value("${server.ssl.trustStoreType:}")
     private String trustStoreType;
-
-    private final StringEncryptionConverter stringEncryptionConverter;
 
     @Autowired
     public StartupManager(final SchedulingRepository schedulingRepository, final AlertProperties alertProperties, final BlackDuckProperties blackDuckProperties,
@@ -114,7 +104,7 @@ public class StartupManager {
         this.dailyTask = dailyTask;
         this.onDemandTask = onDemandTask;
         this.purgeTask = purgeTask;
-        this.phoneHomeTask = phoneHometask;
+        phoneHomeTask = phoneHometask;
         this.alertStartupInitializer = alertStartupInitializer;
         this.providerDescriptorList = providerDescriptorList;
         this.stringEncryptionConverter = stringEncryptionConverter;
@@ -167,11 +157,11 @@ public class StartupManager {
         logger.info("Black Duck URL:                 {}", blackDuckProperties.getBlackDuckUrl().orElse(""));
         logger.info("Black Duck Webserver Host:                 {}", blackDuckProperties.getPublicBlackDuckWebserverHost().orElse(""));
         logger.info("Black Duck Webserver Port:                 {}", blackDuckProperties.getPublicBlackDuckWebserverPort().orElse(""));
-        final Optional<GlobalBlackDuckConfigEntity> optionalGlobalBlackDuckConfigEntity = blackDuckProperties.getBlackDuckConfig();
+        final Optional<BlackDuckEntity> optionalGlobalBlackDuckConfigEntity = blackDuckProperties.getBlackDuckEntity();
         if (optionalGlobalBlackDuckConfigEntity.isPresent()) {
-            final GlobalBlackDuckConfigEntity globalBlackDuckConfigEntity = optionalGlobalBlackDuckConfigEntity.get();
+            final BlackDuckEntity blackDuckEntity = optionalGlobalBlackDuckConfigEntity.get();
             logger.info("Black Duck API Token:           **********");
-            logger.info("Black Duck Timeout:             {}", globalBlackDuckConfigEntity.getBlackDuckTimeout());
+            logger.info("Black Duck Timeout:             {}", blackDuckEntity.getBlackDuckTimeout());
         }
         logger.info("----------------------------------------");
     }

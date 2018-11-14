@@ -34,7 +34,7 @@ import com.synopsys.integration.alert.database.security.StringEncryptionConverte
 
 @Entity
 @Table(schema = "alert", name = "global_blackduck_config")
-public class GlobalBlackDuckConfigEntity extends DatabaseEntity {
+public class BlackDuckEntity extends DatabaseEntity {
     @Column(name = "blackduck_timeout")
     private Integer blackDuckTimeout;
 
@@ -46,11 +46,11 @@ public class GlobalBlackDuckConfigEntity extends DatabaseEntity {
     @Column(name = "blackduck_url")
     private String blackDuckUrl;
 
-    public GlobalBlackDuckConfigEntity() {
+    public BlackDuckEntity() {
         // JPA requires default constructor definitions
     }
 
-    public GlobalBlackDuckConfigEntity(final Integer blackDuckTimeout, final String blackDuckApiKey, final String blackDuckUrl) {
+    public BlackDuckEntity(final Integer blackDuckTimeout, final String blackDuckApiKey, final String blackDuckUrl) {
         this.blackDuckTimeout = blackDuckTimeout;
         this.blackDuckApiKey = blackDuckApiKey;
         this.blackDuckUrl = blackDuckUrl;

@@ -40,6 +40,7 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
 
 import com.synopsys.integration.alert.common.AboutReader;
+import com.synopsys.integration.alert.common.exception.AlertException;
 import com.synopsys.integration.alert.database.entity.CommonDistributionConfigEntity;
 import com.synopsys.integration.alert.database.entity.repository.CommonDistributionRepository;
 import com.synopsys.integration.alert.provider.blackduck.BlackDuckProperties;
@@ -68,23 +69,23 @@ public class PhoneHomeTask extends ScheduledTask {
 
     @Override
     public void run() {
-        final Optional<BlackduckRestConnection> optionalRestConnection = blackDuckProperties.createRestConnectionAndLogErrors(logger);
-        if (optionalRestConnection.isPresent()) {
-            final ExecutorService executorService = Executors.newSingleThreadExecutor();
-            try (final BlackduckRestConnection restConnection = optionalRestConnection.get()) {
-                final HubServicesFactory hubServicesFactory = blackDuckProperties.createBlackDuckServicesFactory(restConnection, new Slf4jIntLogger(logger));
-                // TODO refactor to create a PhoneHomeCallable for alert.  May phone home per provider and channel.
-                final PhoneHomeService phoneHomeService = hubServicesFactory.createPhoneHomeService(executorService);
-                final Optional<PhoneHomeCallable> callable = createPhoneHomeCallable(hubServicesFactory);
-                if (callable.isPresent()) {
-                    phoneHomeService.phoneHome(callable.get());
-                }
-
-            } catch (final IOException e) {
-                logger.error(e.getMessage(), e);
-            } finally {
-                executorService.shutdownNow();
+        final ExecutorService executorService = Executors.newSingleThreadExecutor();
+        try (final BlackduckRestConnection restConnection = blackDuckProperties.getRestConnection(logger)) {
+            final HubServicesFactory hubServicesFactory = blackDuckProperties.createBlackDuckServicesFactory(restConnection, new Slf4jIntLogger(logger));
+            // TODO refactor to create a PhoneHomeCallable for alert.  May phone home per provider and channel.
+            // TODO convert phone home to not rely on BlackDuck
+            final PhoneHomeService phoneHomeService = hubServicesFactory.createPhoneHomeService(executorService);
+            final Optional<PhoneHomeCallable> callable = createPhoneHomeCallable(hubServicesFactory);
+            if (callable.isPresent()) {
+                phoneHomeService.phoneHome(callable.get());
             }
+
+        } catch (final IOException e) {
+            logger.error(e.getMessage(), e);
+        } catch (final AlertException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            executorService.shutdownNow();
         }
     }
 
