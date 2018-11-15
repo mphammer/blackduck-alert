@@ -21,18 +21,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.alert.common.field;
+package com.synopsys.integration.alert.database.system;
 
-import java.lang.reflect.Type;
-import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.google.gson.reflect.TypeToken;
-import com.synopsys.integration.alert.common.enumeration.FieldContentIdentifier;
-
-public class LongHierarchicalField extends HierarchicalField {
-    private static final Type TYPE = new TypeToken<Long>() {}.getType();
-
-    public LongHierarchicalField(final List<String> pathToField, final String innerMostFieldName, final FieldContentIdentifier contentIdentifier, final String label) {
-        super(pathToField, innerMostFieldName, contentIdentifier, label, TYPE);
-    }
+public interface SystemStatusRepository extends JpaRepository<SystemStatus, Long> {
 }

@@ -21,18 +21,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.alert.database.purge;
+package com.synopsys.integration.alert.web.model;
 
-import java.util.List;
+public class SystemMessageModel {
+    private final String type;
+    private final String createdAt;
+    private final String content;
 
-import org.springframework.batch.item.ItemProcessor;
+    public SystemMessageModel(final String type, final String createdAt, final String content) {
+        this.type = type;
+        this.createdAt = createdAt;
+        this.content = content;
+    }
 
-import com.synopsys.integration.alert.database.entity.NotificationContent;
+    public String getType() {
+        return type;
+    }
 
-public class PurgeProcessor implements ItemProcessor<List<NotificationContent>, List<NotificationContent>> {
+    public String getCreatedAt() {
+        return createdAt;
+    }
 
-    @Override
-    public List<NotificationContent> process(final List<NotificationContent> item) throws Exception {
-        return item;
+    public String getContent() {
+        return content;
     }
 }
