@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.3.xsd">
+    <changeSet author="bmandel" id="1542747082248-1">
+        <createTable tableName="FIELD_VALUES" schemaName="ALERT">
+            <column autoIncrement="true" name="ID" type="BIGINT(19)">
+                <constraints primaryKey="true" primaryKeyName="CONSTRAINT_5"/>
+            </column>
+            <column name="KEY" type="VARCHAR(255)"/>
+            <column name="VALUE" type="VARCHAR(255)"/>
+            <column name="SECURE" type="BOOLEAN(1)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="bmandel" id="1542747082248-2">
+        <createTable tableName="GROUPING" schemaName="ALERT">
+            <column autoIncrement="true" name="ID" type="BIGINT(19)">
+                <constraints primaryKey="true" primaryKeyName="CONSTRAINT_5"/>
+            </column>
+            <column name="DESCRIPTOR_TYPE" type="VARCHAR(255)"/>
+            <column name="DISPLAY_TYPE" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="bmandel" id="1542747082248-3">
+        <createTable tableName="GROUPING_FIELD_RELATION" schemaName="ALERT">
+            <column name="GROUPING_ID" type="BIGINT(19)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="FIELD_ID" type="BIGINT(19)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

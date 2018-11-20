@@ -47,6 +47,6 @@ public class ResponseBodyBuilderTest {
 
         responseBodyBuilder.putErrors(errors);
 
-        assertEquals("{\"id\":33,\"message\":\"There were errors\",\"errors\":{\"Field\":\"Terrible error\"}}", responseBodyBuilder.build());
+        assertEquals("{\"id\":33,\"message\":\"There were errors\",\"errors\":{\"FieldValuesEntity\":\"Terrible error\"}}", responseBodyBuilder.build());
     }
 }
