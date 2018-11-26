@@ -13,7 +13,6 @@ package com.synopsys.integration.alert.channel.email.mock;
 
 import com.google.gson.JsonObject;
 import com.synopsys.integration.alert.mock.MockGlobalRestModelUtil;
-import com.synopsys.integration.alert.web.channel.model.EmailGlobalConfig;
 
 public class MockEmailGlobalRestModel extends MockGlobalRestModelUtil<EmailGlobalConfig> {
     private String mailSmtpHost;
@@ -68,20 +67,20 @@ public class MockEmailGlobalRestModel extends MockGlobalRestModelUtil<EmailGloba
 
     public MockEmailGlobalRestModel() {
         this("MailSmtpHost", "MailSmtpUser", "MailSmtpPassword", false, "99", "400", "500", "600", "MailSmtpFrom", "MailSmtpLocalhost", "MailSmtpLocalAddress", "700", true, false, "MailSmtpAuthMechanisms", true, false, true,
-                false, "MailSmtpAuthNtlmDomain", "22", false, "MailSmtpSubmitter", "MailSmtpDnsNotify", "MailSmtpDnsRet", true, false, true, "MailSmtpSaslMechanisms", "MailSmtpSaslAuthorizationId", "MailSmtpSaslRealm",
-                true, false, true, false, true, "MailSmtpSslTrust", "MailSmtpSslProtocols", "MailSmtpSslCipherSuites", true, false, "MailSmtpProxyHost", "800", "MailSmtpSocksHost", "900", "MailSmtpMailExtension",
-                true, false, "1");
+            false, "MailSmtpAuthNtlmDomain", "22", false, "MailSmtpSubmitter", "MailSmtpDnsNotify", "MailSmtpDnsRet", true, false, true, "MailSmtpSaslMechanisms", "MailSmtpSaslAuthorizationId", "MailSmtpSaslRealm",
+            true, false, true, false, true, "MailSmtpSslTrust", "MailSmtpSslProtocols", "MailSmtpSslCipherSuites", true, false, "MailSmtpProxyHost", "800", "MailSmtpSocksHost", "900", "MailSmtpMailExtension",
+            true, false, "1");
     }
 
     private MockEmailGlobalRestModel(final String mailSmtpHost, final String mailSmtpUser, final String mailSmtpPassword, final boolean mailSmtpPasswordIsSet, final String mailSmtpPort,
-            final String mailSmtpConnectionTimeout, final String mailSmtpTimeout,
-            final String mailSmtpWriteTimeout, final String mailSmtpFrom, final String mailSmtpLocalhost, final String mailSmtpLocalAddress, final String mailSmtpLocalPort, final boolean mailSmtpEhlo, final boolean mailSmtpAuth,
-            final String mailSmtpAuthMechanisms, final boolean mailSmtpAuthLoginDisable, final boolean mailSmtpAuthPlainDisable, final boolean mailSmtpAuthDigestMd5Disable, final boolean mailSmtpAuthNtlmDisable,
-            final String mailSmtpAuthNtlmDomain, final String mailSmtpAuthNtlmFlags, final boolean mailSmtpAuthXoauth2Disable, final String mailSmtpSubmitter, final String mailSmtpDnsNotify, final String mailSmtpDnsRet,
-            final boolean mailSmtpAllow8bitmime, final boolean mailSmtpSendPartial, final boolean mailSmtpSaslEnable, final String mailSmtpSaslMechanisms, final String mailSmtpSaslAuthorizationId, final String mailSmtpSaslRealm,
-            final boolean mailSmtpSaslUseCanonicalHostname, final boolean mailSmtpQuitwait, final boolean mailSmtpReportSuccess, final boolean mailSmtpSslEnable, final boolean mailSmtpSslCheckServerIdentity, final String mailSmtpSslTrust,
-            final String mailSmtpSslProtocols, final String mailSmtpSslCipherSuites, final boolean mailSmtpStartTlsEnable, final boolean mailSmtpStartTlsRequired, final String mailSmtpProxyHost, final String mailSmtpProxyPort,
-            final String mailSmtpSocksHost, final String mailSmtpSocksPort, final String mailSmtpMailExtension, final boolean mailSmtpUserSet, final boolean mailSmtpNoopStrict, final String id) {
+        final String mailSmtpConnectionTimeout, final String mailSmtpTimeout,
+        final String mailSmtpWriteTimeout, final String mailSmtpFrom, final String mailSmtpLocalhost, final String mailSmtpLocalAddress, final String mailSmtpLocalPort, final boolean mailSmtpEhlo, final boolean mailSmtpAuth,
+        final String mailSmtpAuthMechanisms, final boolean mailSmtpAuthLoginDisable, final boolean mailSmtpAuthPlainDisable, final boolean mailSmtpAuthDigestMd5Disable, final boolean mailSmtpAuthNtlmDisable,
+        final String mailSmtpAuthNtlmDomain, final String mailSmtpAuthNtlmFlags, final boolean mailSmtpAuthXoauth2Disable, final String mailSmtpSubmitter, final String mailSmtpDnsNotify, final String mailSmtpDnsRet,
+        final boolean mailSmtpAllow8bitmime, final boolean mailSmtpSendPartial, final boolean mailSmtpSaslEnable, final String mailSmtpSaslMechanisms, final String mailSmtpSaslAuthorizationId, final String mailSmtpSaslRealm,
+        final boolean mailSmtpSaslUseCanonicalHostname, final boolean mailSmtpQuitwait, final boolean mailSmtpReportSuccess, final boolean mailSmtpSslEnable, final boolean mailSmtpSslCheckServerIdentity, final String mailSmtpSslTrust,
+        final String mailSmtpSslProtocols, final String mailSmtpSslCipherSuites, final boolean mailSmtpStartTlsEnable, final boolean mailSmtpStartTlsRequired, final String mailSmtpProxyHost, final String mailSmtpProxyPort,
+        final String mailSmtpSocksHost, final String mailSmtpSocksPort, final String mailSmtpMailExtension, final boolean mailSmtpUserSet, final boolean mailSmtpNoopStrict, final String id) {
         this.mailSmtpHost = mailSmtpHost;
         this.mailSmtpUser = mailSmtpUser;
         this.mailSmtpPassword = mailSmtpPassword;
@@ -518,26 +517,26 @@ public class MockEmailGlobalRestModel extends MockGlobalRestModelUtil<EmailGloba
         this.mailSmtpNoopStrict = mailSmtpNoopStrict;
     }
 
-    public void setId(final String id) {
-        this.id = id;
-    }
-
     @Override
     public Long getId() {
         return Long.valueOf(id);
     }
 
+    public void setId(final String id) {
+        this.id = id;
+    }
+
     @Override
     public EmailGlobalConfig createGlobalRestModel() {
         final EmailGlobalConfig restModel = new EmailGlobalConfig(id, mailSmtpHost, mailSmtpUser, mailSmtpPassword, mailSmtpPasswordIsSet, mailSmtpPort,
-                mailSmtpConnectionTimeout, mailSmtpTimeout,
-                mailSmtpWriteTimeout, mailSmtpFrom, mailSmtpLocalhost, mailSmtpLocalAddress, mailSmtpLocalPort, mailSmtpEhlo, mailSmtpAuth,
-                mailSmtpAuthMechanisms, mailSmtpAuthLoginDisable, mailSmtpAuthPlainDisable, mailSmtpAuthDigestMd5Disable, mailSmtpAuthNtlmDisable,
-                mailSmtpAuthNtlmDomain, mailSmtpAuthNtlmFlags, mailSmtpAuthXoauth2Disable, mailSmtpSubmitter, mailSmtpDnsNotify, mailSmtpDnsRet,
-                mailSmtpAllow8bitmime, mailSmtpSendPartial, mailSmtpSaslEnable, mailSmtpSaslMechanisms, mailSmtpSaslAuthorizationId, mailSmtpSaslRealm,
-                mailSmtpSaslUseCanonicalHostname, mailSmtpQuitwait, mailSmtpReportSuccess, mailSmtpSslEnable, mailSmtpSslCheckServerIdentity, mailSmtpSslTrust,
-                mailSmtpSslProtocols, mailSmtpSslCipherSuites, mailSmtpStartTlsEnable, mailSmtpStartTlsRequired, mailSmtpProxyHost, mailSmtpProxyPort,
-                mailSmtpSocksHost, mailSmtpSocksPort, mailSmtpMailExtension, mailSmtpUserSet, mailSmtpNoopStrict);
+            mailSmtpConnectionTimeout, mailSmtpTimeout,
+            mailSmtpWriteTimeout, mailSmtpFrom, mailSmtpLocalhost, mailSmtpLocalAddress, mailSmtpLocalPort, mailSmtpEhlo, mailSmtpAuth,
+            mailSmtpAuthMechanisms, mailSmtpAuthLoginDisable, mailSmtpAuthPlainDisable, mailSmtpAuthDigestMd5Disable, mailSmtpAuthNtlmDisable,
+            mailSmtpAuthNtlmDomain, mailSmtpAuthNtlmFlags, mailSmtpAuthXoauth2Disable, mailSmtpSubmitter, mailSmtpDnsNotify, mailSmtpDnsRet,
+            mailSmtpAllow8bitmime, mailSmtpSendPartial, mailSmtpSaslEnable, mailSmtpSaslMechanisms, mailSmtpSaslAuthorizationId, mailSmtpSaslRealm,
+            mailSmtpSaslUseCanonicalHostname, mailSmtpQuitwait, mailSmtpReportSuccess, mailSmtpSslEnable, mailSmtpSslCheckServerIdentity, mailSmtpSslTrust,
+            mailSmtpSslProtocols, mailSmtpSslCipherSuites, mailSmtpStartTlsEnable, mailSmtpStartTlsRequired, mailSmtpProxyHost, mailSmtpProxyPort,
+            mailSmtpSocksHost, mailSmtpSocksPort, mailSmtpMailExtension, mailSmtpUserSet, mailSmtpNoopStrict);
         return restModel;
     }
 

@@ -11,10 +11,11 @@
  */
 package com.synopsys.integration.alert.channel.email.model;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import com.synopsys.integration.alert.channel.email.mock.MockEmailGlobalRestModel;
-import com.synopsys.integration.alert.web.channel.model.EmailGlobalConfig;
 import com.synopsys.integration.alert.web.model.GlobalRestModelTest;
 
 public class GlobalEmailConfigRestModelTest extends GlobalRestModelTest<EmailGlobalConfig> {

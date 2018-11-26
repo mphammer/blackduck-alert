@@ -21,46 +21,32 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.alert.database.channel.hipchat;
+package com.synopsys.integration.alert.database.provider.blackduck.relation;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import java.io.Serializable;
 
-import com.synopsys.integration.alert.database.entity.channel.DistributionChannelConfigEntity;
+@SuppressWarnings("serial")
+public class UserProjectRelationPK implements Serializable {
+    private Long blackDuckUserId;
+    private Long blackDuckProjectId;
 
-@Entity
-@Table(schema = "alert", name = "hip_chat_distribution_config")
-public class HipChatDistributionConfigEntity extends DistributionChannelConfigEntity {
-    @Column(name = "room_id")
-    private Integer roomId;
-
-    @Column(name = "notify")
-    private Boolean notify;
-
-    @Column(name = "color")
-    private String color;
-
-    public HipChatDistributionConfigEntity() {
+    public UserProjectRelationPK() {
         // JPA requires default constructor definitions
     }
 
-    public HipChatDistributionConfigEntity(final Integer roomId, final Boolean notify, final String color) {
-        this.roomId = roomId;
-        this.notify = notify;
-        this.color = color;
+    public Long getBlackDuckUserId() {
+        return blackDuckUserId;
     }
 
-    public Integer getRoomId() {
-        return roomId;
+    public void setBlackDuckUserId(final Long blackDuckUserId) {
+        this.blackDuckUserId = blackDuckUserId;
     }
 
-    public Boolean getNotify() {
-        return notify;
+    public Long getBlackDuckProjectId() {
+        return blackDuckProjectId;
     }
 
-    public String getColor() {
-        return color;
+    public void setBlackDuckProjectId(final Long blackDuckProjectId) {
+        this.blackDuckProjectId = blackDuckProjectId;
     }
-
 }

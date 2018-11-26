@@ -14,7 +14,6 @@ package com.synopsys.integration.alert.channel.slack.mock;
 import com.google.gson.JsonObject;
 import com.synopsys.integration.alert.mock.model.MockCommonDistributionRestModel;
 import com.synopsys.integration.alert.mock.model.MockRestModelUtil;
-import com.synopsys.integration.alert.web.channel.model.SlackDistributionConfig;
 
 public class MockSlackRestModel extends MockRestModelUtil<SlackDistributionConfig> {
     private final MockCommonDistributionRestModel distributionMockUtil = new MockCommonDistributionRestModel();

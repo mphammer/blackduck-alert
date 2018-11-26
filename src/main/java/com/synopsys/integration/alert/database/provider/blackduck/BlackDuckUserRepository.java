@@ -21,9 +21,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.alert.database.scheduling;
+package com.synopsys.integration.alert.database.provider.blackduck;
+
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface SchedulingRepository extends JpaRepository<SchedulingConfigEntity, Long> {
+public interface BlackDuckUserRepository extends JpaRepository<BlackDuckUserEntity, Long> {
+    public List<BlackDuckUserEntity> findByEmailAddress(final String emailAddress);
 }

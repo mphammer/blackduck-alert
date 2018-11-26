@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.synopsys.integration.alert.TestPropertyKey;
 import com.synopsys.integration.alert.channel.hipchat.mock.MockHipChatGlobalEntity;
 import com.synopsys.integration.alert.channel.hipchat.mock.MockHipChatGlobalRestModel;
-import com.synopsys.integration.alert.database.channel.hipchat.HipChatGlobalRepositoryAccessor;
 import com.synopsys.integration.alert.database.entity.DatabaseEntity;
 import com.synopsys.integration.alert.web.controller.GlobalControllerTest;
 import com.synopsys.integration.alert.web.model.Config;

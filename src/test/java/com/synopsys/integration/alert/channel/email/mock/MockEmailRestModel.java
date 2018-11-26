@@ -14,15 +14,13 @@ package com.synopsys.integration.alert.channel.email.mock;
 import com.google.gson.JsonObject;
 import com.synopsys.integration.alert.mock.model.MockCommonDistributionRestModel;
 import com.synopsys.integration.alert.mock.model.MockRestModelUtil;
-import com.synopsys.integration.alert.web.channel.model.EmailDistributionConfig;
 
 public class MockEmailRestModel extends MockRestModelUtil<EmailDistributionConfig> {
     private final MockCommonDistributionRestModel distributionMockUtil = new MockCommonDistributionRestModel();
-
+    private final boolean projectOwnerOnly;
     private String id;
     private String emailTemplateLogoImage;
     private String emailSubjectLine;
-    private final boolean projectOwnerOnly;
 
     public MockEmailRestModel() {
         this("1", "emailTemplateLogoImage", "emailSubjectLine", false);
@@ -35,18 +33,6 @@ public class MockEmailRestModel extends MockRestModelUtil<EmailDistributionConfi
         this.projectOwnerOnly = projectOwnerOnly;
     }
 
-    public void setId(final String id) {
-        this.id = id;
-    }
-
-    public void setEmailTemplateLogoImage(final String emailTemplateLogoImage) {
-        this.emailTemplateLogoImage = emailTemplateLogoImage;
-    }
-
-    public void setEmailSubjectLine(final String emailSubjectLine) {
-        this.emailSubjectLine = emailSubjectLine;
-    }
-
     public boolean isProjectOwnerOnly() {
         return projectOwnerOnly;
     }
@@ -56,12 +42,24 @@ public class MockEmailRestModel extends MockRestModelUtil<EmailDistributionConfi
         return Long.valueOf(id);
     }
 
+    public void setId(final String id) {
+        this.id = id;
+    }
+
     public String getEmailTemplateLogoImage() {
         return emailTemplateLogoImage;
     }
 
+    public void setEmailTemplateLogoImage(final String emailTemplateLogoImage) {
+        this.emailTemplateLogoImage = emailTemplateLogoImage;
+    }
+
     public String getEmailSubjectLine() {
         return emailSubjectLine;
+    }
+
+    public void setEmailSubjectLine(final String emailSubjectLine) {
+        this.emailSubjectLine = emailSubjectLine;
     }
 
     @Override

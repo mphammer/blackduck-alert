@@ -47,6 +47,7 @@ import com.synopsys.integration.alert.database.entity.NotificationContent;
 import com.synopsys.integration.alert.web.model.CommonDistributionConfig;
 import com.synopsys.integration.alert.workflow.filter.NotificationFilter;
 
+// TODO We are using parallel streams all over the place here. They may actually decrease performance.
 @Component
 public class MessageContentAggregator {
     private final JobConfigReader jobConfigReader;
@@ -60,6 +61,7 @@ public class MessageContentAggregator {
         this.notificationFilter = notificationFilter;
     }
 
+    // TODO verify whether or not all of these if statements are necessary
     public Map<? extends CommonDistributionConfig, List<AggregateMessageContent>> processNotifications(final FrequencyType frequency, final Collection<NotificationContent> notificationList) {
         if (notificationList.isEmpty()) {
             return Collections.emptyMap();
@@ -113,6 +115,7 @@ public class MessageContentAggregator {
         return Collections.emptyList();
     }
 
+    // TODO this method can be removed and replaced with the DescriptorMap
     private Optional<ProviderDescriptor> getProviderDescriptorByName(final String name) {
         return providerDescriptors.parallelStream()
                    .filter(descriptor -> name.equals(descriptor.getName()))

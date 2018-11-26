@@ -11,11 +11,9 @@
  */
 package com.synopsys.integration.alert.channel.hipchat.model;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import com.synopsys.integration.alert.channel.hipchat.mock.MockHipChatGlobalRestModel;
-import com.synopsys.integration.alert.web.channel.model.HipChatGlobalConfig;
 import com.synopsys.integration.alert.web.model.GlobalRestModelTest;
 
 public class GlobalHipChatConfigRestModelTest extends GlobalRestModelTest<HipChatGlobalConfig> {

@@ -12,14 +12,13 @@ import org.junit.Test;
 import com.synopsys.integration.alert.common.model.AggregateMessageContent;
 import com.synopsys.integration.alert.common.model.LinkableItem;
 import com.synopsys.integration.alert.database.entity.DatabaseEntity;
-import com.synopsys.integration.alert.database.provider.blackduck.data.BlackDuckProjectEntity;
-import com.synopsys.integration.alert.database.provider.blackduck.data.BlackDuckUserEntity;
-import com.synopsys.integration.alert.database.provider.blackduck.data.relation.UserProjectRelation;
+import com.synopsys.integration.alert.database.provider.blackduck.BlackDuckProjectEntity;
+import com.synopsys.integration.alert.database.provider.blackduck.BlackDuckUserEntity;
+import com.synopsys.integration.alert.database.provider.blackduck.relation.UserProjectRelation;
 import com.synopsys.integration.alert.provider.blackduck.BlackDuckProvider;
 import com.synopsys.integration.alert.provider.blackduck.mock.MockBlackDuckProjectRepositoryAccessor;
 import com.synopsys.integration.alert.provider.blackduck.mock.MockBlackDuckUserRepositoryAccessor;
 import com.synopsys.integration.alert.provider.blackduck.mock.MockUserProjectRelationRepositoryAccessor;
-import com.synopsys.integration.alert.web.channel.model.EmailDistributionConfig;
 import com.synopsys.integration.rest.RestConstants;
 
 public class EmailEventProducerTest {

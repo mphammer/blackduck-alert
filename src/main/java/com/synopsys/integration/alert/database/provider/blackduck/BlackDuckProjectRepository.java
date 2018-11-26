@@ -21,9 +21,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.alert.database.channel.email;
+package com.synopsys.integration.alert.database.provider.blackduck;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface EmailGroupDistributionRepository extends JpaRepository<EmailGroupDistributionConfigEntity, Long> {
+public interface BlackDuckProjectRepository extends JpaRepository<BlackDuckProjectEntity, Long> {
+    public BlackDuckProjectEntity findByName(final String name);
 }

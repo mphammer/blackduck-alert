@@ -33,8 +33,6 @@ import com.synopsys.integration.alert.channel.hipchat.HipChatChannel;
 import com.synopsys.integration.alert.channel.hipchat.HipChatChannelEvent;
 import com.synopsys.integration.alert.channel.hipchat.HipChatEventProducer;
 import com.synopsys.integration.alert.common.descriptor.config.DescriptorActionApi;
-import com.synopsys.integration.alert.database.channel.hipchat.HipChatDistributionRepositoryAccessor;
-import com.synopsys.integration.alert.web.channel.model.HipChatDistributionConfig;
 import com.synopsys.integration.alert.web.model.CommonDistributionConfig;
 import com.synopsys.integration.alert.web.model.Config;
 import com.synopsys.integration.exception.IntegrationException;

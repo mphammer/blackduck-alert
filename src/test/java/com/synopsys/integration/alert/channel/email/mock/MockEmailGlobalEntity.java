@@ -14,7 +14,6 @@ package com.synopsys.integration.alert.channel.email.mock;
 import com.google.gson.JsonObject;
 import com.synopsys.integration.alert.database.channel.email.EmailGlobalConfigEntity;
 import com.synopsys.integration.alert.mock.MockGlobalEntityUtil;
-import com.synopsys.integration.alert.web.channel.model.EmailGlobalConfig;
 import com.synopsys.integration.alert.web.model.Config;
 
 public class MockEmailGlobalEntity extends MockGlobalEntityUtil<EmailGlobalConfigEntity> {

@@ -13,7 +13,6 @@ package com.synopsys.integration.alert.web.scheduling.model;
 
 import com.google.gson.JsonObject;
 import com.synopsys.integration.alert.mock.MockGlobalRestModelUtil;
-import com.synopsys.integration.alert.web.component.scheduling.SchedulingConfig;
 
 public class MockGlobalSchedulingRestModel extends MockGlobalRestModelUtil<SchedulingConfig> {
     private String accumulatorNextRun;
@@ -36,53 +35,53 @@ public class MockGlobalSchedulingRestModel extends MockGlobalRestModelUtil<Sched
         this.id = id;
     }
 
-    public void setAccumulatorNextRun(final String accumulatorNextRun) {
-        this.accumulatorNextRun = accumulatorNextRun;
-    }
-
-    public void setDailyDigestHourOfDay(final String dailyDigestHourOfDay) {
-        this.dailyDigestHourOfDay = dailyDigestHourOfDay;
-    }
-
-    public void setDailyDigestNextRun(final String dailyDigestNextRun) {
-        this.dailyDigestNextRun = dailyDigestNextRun;
-    }
-
-    public void setPurgeDataFrequencyDays(final String purgeDataFrequencyDays) {
-        this.purgeDataFrequencyDays = purgeDataFrequencyDays;
-    }
-
-    public void setPurgeDataNextRun(final String purgeDataNextRun) {
-        this.purgeDataNextRun = purgeDataNextRun;
-    }
-
-    public void setId(final String id) {
-        this.id = id;
-    }
-
     public String getAccumulatorNextRun() {
         return accumulatorNextRun;
+    }
+
+    public void setAccumulatorNextRun(final String accumulatorNextRun) {
+        this.accumulatorNextRun = accumulatorNextRun;
     }
 
     public String getDailyDigestHourOfDay() {
         return dailyDigestHourOfDay;
     }
 
+    public void setDailyDigestHourOfDay(final String dailyDigestHourOfDay) {
+        this.dailyDigestHourOfDay = dailyDigestHourOfDay;
+    }
+
     public String getDailyDigestNextRun() {
         return dailyDigestNextRun;
+    }
+
+    public void setDailyDigestNextRun(final String dailyDigestNextRun) {
+        this.dailyDigestNextRun = dailyDigestNextRun;
     }
 
     public String getPurgeDataFrequencyDays() {
         return purgeDataFrequencyDays;
     }
 
+    public void setPurgeDataFrequencyDays(final String purgeDataFrequencyDays) {
+        this.purgeDataFrequencyDays = purgeDataFrequencyDays;
+    }
+
     public String getPurgeDataNextRun() {
         return purgeDataNextRun;
+    }
+
+    public void setPurgeDataNextRun(final String purgeDataNextRun) {
+        this.purgeDataNextRun = purgeDataNextRun;
     }
 
     @Override
     public Long getId() {
         return Long.valueOf(id);
+    }
+
+    public void setId(final String id) {
+        this.id = id;
     }
 
     @Override

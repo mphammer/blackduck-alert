@@ -14,7 +14,6 @@ package com.synopsys.integration.alert.channel.hipchat.mock;
 import com.google.gson.JsonObject;
 import com.synopsys.integration.alert.database.channel.hipchat.HipChatGlobalConfigEntity;
 import com.synopsys.integration.alert.mock.MockGlobalEntityUtil;
-import com.synopsys.integration.alert.web.channel.model.HipChatGlobalConfig;
 import com.synopsys.integration.alert.web.model.Config;
 
 public class MockHipChatGlobalEntity extends MockGlobalEntityUtil<HipChatGlobalConfigEntity> {
@@ -69,7 +68,7 @@ public class MockHipChatGlobalEntity extends MockGlobalEntityUtil<HipChatGlobalC
 
     @Override
     public Config createGlobalConfig() {
-        HipChatGlobalConfig config = new HipChatGlobalConfig(id.toString(), apiKey, true, hostServer);
+        final HipChatGlobalConfig config = new HipChatGlobalConfig(id.toString(), apiKey, true, hostServer);
         return config;
     }
 

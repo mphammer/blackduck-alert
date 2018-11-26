@@ -8,7 +8,6 @@ import com.synopsys.integration.alert.channel.slack.mock.MockSlackEntity;
 import com.synopsys.integration.alert.channel.slack.mock.MockSlackRestModel;
 import com.synopsys.integration.alert.database.channel.slack.SlackDistributionConfigEntity;
 import com.synopsys.integration.alert.database.channel.slack.SlackDistributionRepositoryAccessor;
-import com.synopsys.integration.alert.web.channel.model.SlackDistributionConfig;
 import com.synopsys.integration.alert.web.controller.ControllerTest;
 
 public class SlackChannelDistributionControllerTestIT extends ControllerTest {

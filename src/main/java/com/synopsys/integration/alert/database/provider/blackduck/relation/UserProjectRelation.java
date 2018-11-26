@@ -21,38 +21,43 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.alert.database.scheduling;
+package com.synopsys.integration.alert.database.provider.blackduck.relation;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.Table;
 
-import com.synopsys.integration.alert.database.entity.DatabaseEntity;
+import com.synopsys.integration.alert.database.relation.DatabaseRelation;
 
 @Entity
-@Table(schema = "alert", name = "global_scheduling_config")
-public class SchedulingConfigEntity extends DatabaseEntity {
-    @Column(name = "alert_digest_daily_hour_of_day")
-    private String dailyDigestHourOfDay;
+@IdClass(UserProjectRelationPK.class)
+@Table(schema = "alert", name = "blackduck_user_project_relation")
+public class UserProjectRelation extends DatabaseRelation {
+    @Id
+    @Column(name = "blackduck_user_id")
+    private Long blackDuckUserId;
 
-    @Column(name = "alert_purge_data_frequency_days")
-    private String purgeDataFrequencyDays;
+    @Id
+    @Column(name = "blackduck_project_id")
+    private Long blackDuckProjectId;
 
-    public SchedulingConfigEntity() {
-
+    public UserProjectRelation() {
+        // JPA requires default constructor definitions
     }
 
-    public SchedulingConfigEntity(final String dailyDigestHourOfDay, final String purgeDataFrequencyDays) {
-        this.dailyDigestHourOfDay = dailyDigestHourOfDay;
-        this.purgeDataFrequencyDays = purgeDataFrequencyDays;
+    public UserProjectRelation(final Long blackDuckUserId, final Long blackDuckProjectId) {
+        super();
+        this.blackDuckUserId = blackDuckUserId;
+        this.blackDuckProjectId = blackDuckProjectId;
     }
 
-    public String getDailyDigestHourOfDay() {
-        return dailyDigestHourOfDay;
+    public Long getBlackDuckUserId() {
+        return blackDuckUserId;
     }
 
-    public String getPurgeDataFrequencyDays() {
-        return purgeDataFrequencyDays;
+    public Long getBlackDuckProjectId() {
+        return blackDuckProjectId;
     }
-
 }

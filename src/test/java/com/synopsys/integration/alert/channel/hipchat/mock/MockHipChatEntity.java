@@ -12,7 +12,6 @@
 package com.synopsys.integration.alert.channel.hipchat.mock;
 
 import com.google.gson.JsonObject;
-import com.synopsys.integration.alert.database.channel.hipchat.HipChatDistributionConfigEntity;
 import com.synopsys.integration.alert.mock.entity.MockEntityUtil;
 
 public class MockHipChatEntity extends MockEntityUtil<HipChatDistributionConfigEntity> {

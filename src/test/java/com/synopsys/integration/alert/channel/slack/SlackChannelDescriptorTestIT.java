@@ -22,7 +22,6 @@ import com.synopsys.integration.alert.database.channel.slack.SlackDistributionRe
 import com.synopsys.integration.alert.database.entity.DatabaseEntity;
 import com.synopsys.integration.alert.database.entity.channel.GlobalChannelConfigEntity;
 import com.synopsys.integration.alert.mock.model.MockRestModelUtil;
-import com.synopsys.integration.alert.web.channel.model.SlackDistributionConfig;
 
 public class SlackChannelDescriptorTestIT extends DescriptorTestConfigTest<SlackDistributionConfig, SlackDistributionConfigEntity, GlobalChannelConfigEntity, SlackEventProducer> {
     @Autowired
@@ -88,9 +87,9 @@ public class SlackChannelDescriptorTestIT extends DescriptorTestConfigTest<Slack
     @Override
     public MockRestModelUtil<SlackDistributionConfig> getMockRestModelUtil() {
         final MockSlackRestModel restModel = new MockSlackRestModel();
-        restModel.setChannelName(this.properties.getProperty(TestPropertyKey.TEST_SLACK_CHANNEL_NAME));
-        restModel.setChannelUsername(this.properties.getProperty(TestPropertyKey.TEST_SLACK_USERNAME));
-        restModel.setWebhook(this.properties.getProperty(TestPropertyKey.TEST_SLACK_WEBHOOK));
+        restModel.setChannelName(properties.getProperty(TestPropertyKey.TEST_SLACK_CHANNEL_NAME));
+        restModel.setChannelUsername(properties.getProperty(TestPropertyKey.TEST_SLACK_USERNAME));
+        restModel.setWebhook(properties.getProperty(TestPropertyKey.TEST_SLACK_WEBHOOK));
         return restModel;
     }
 

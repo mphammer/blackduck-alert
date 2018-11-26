@@ -13,7 +13,6 @@ package com.synopsys.integration.alert.channel.hipchat.mock;
 
 import com.google.gson.JsonObject;
 import com.synopsys.integration.alert.mock.MockGlobalRestModelUtil;
-import com.synopsys.integration.alert.web.channel.model.HipChatGlobalConfig;
 
 public class MockHipChatGlobalRestModel extends MockGlobalRestModelUtil<HipChatGlobalConfig> {
     private String apiKey;
@@ -40,29 +39,29 @@ public class MockHipChatGlobalRestModel extends MockGlobalRestModelUtil<HipChatG
         this.hostServer = hostServer;
     }
 
-    public void setApiKey(final String apiKey) {
-        this.apiKey = apiKey;
-    }
-
-    public void setApiKeyIsSet(final boolean apiKeyIsSet) {
-        this.apiKeyIsSet = apiKeyIsSet;
-    }
-
-    public void setId(final String id) {
-        this.id = id;
-    }
-
     public String getApiKey() {
         return apiKey;
+    }
+
+    public void setApiKey(final String apiKey) {
+        this.apiKey = apiKey;
     }
 
     public boolean isApiKeyIsSet() {
         return apiKeyIsSet;
     }
 
+    public void setApiKeyIsSet(final boolean apiKeyIsSet) {
+        this.apiKeyIsSet = apiKeyIsSet;
+    }
+
     @Override
     public Long getId() {
         return Long.valueOf(id);
+    }
+
+    public void setId(final String id) {
+        this.id = id;
     }
 
     @Override

@@ -7,8 +7,6 @@ import com.synopsys.integration.alert.channel.hipchat.HipChatChannel;
 import com.synopsys.integration.alert.channel.hipchat.mock.MockHipChatEntity;
 import com.synopsys.integration.alert.channel.hipchat.mock.MockHipChatGlobalEntity;
 import com.synopsys.integration.alert.channel.hipchat.mock.MockHipChatRestModel;
-import com.synopsys.integration.alert.database.channel.hipchat.HipChatDistributionRepositoryAccessor;
-import com.synopsys.integration.alert.database.channel.hipchat.HipChatGlobalRepositoryAccessor;
 import com.synopsys.integration.alert.database.entity.DatabaseEntity;
 import com.synopsys.integration.alert.web.controller.ControllerTest;
 import com.synopsys.integration.alert.web.model.CommonDistributionConfig;

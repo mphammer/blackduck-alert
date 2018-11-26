@@ -11,10 +11,10 @@
  */
 package com.synopsys.integration.alert.channel.hipchat.model;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 
 import com.synopsys.integration.alert.channel.hipchat.mock.MockHipChatRestModel;
-import com.synopsys.integration.alert.web.channel.model.HipChatDistributionConfig;
 import com.synopsys.integration.alert.web.model.CommonDistributionRestModelTest;
 
 public class HipChatConfigRestModelTest extends CommonDistributionRestModelTest<HipChatDistributionConfig> {

@@ -31,7 +31,6 @@ import org.springframework.stereotype.Component;
 import com.synopsys.integration.alert.common.descriptor.config.StartupComponent;
 import com.synopsys.integration.alert.database.entity.EntityPropertyMapper;
 import com.synopsys.integration.alert.database.scheduling.SchedulingConfigEntity;
-import com.synopsys.integration.alert.web.component.scheduling.SchedulingConfig;
 import com.synopsys.integration.alert.workflow.startup.AlertStartupProperty;
 
 @Component

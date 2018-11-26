@@ -24,47 +24,50 @@
 package com.synopsys.integration.alert.database.provider.blackduck;
 
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import com.synopsys.integration.alert.common.annotation.SensitiveField;
 import com.synopsys.integration.alert.database.entity.DatabaseEntity;
-import com.synopsys.integration.alert.database.security.StringEncryptionConverter;
 
 @Entity
-@Table(schema = "alert", name = "global_blackduck_config")
-public class GlobalBlackDuckConfigEntity extends DatabaseEntity {
-    @Column(name = "blackduck_timeout")
-    private Integer blackDuckTimeout;
+@Table(schema = "alert", name = "blackduck_project")
+public class BlackDuckProjectEntity extends DatabaseEntity {
+    @Column(name = "name")
+    private String name;
 
-    // @EncryptedStringField
-    @Column(name = "blackduck_api_key")
-    @SensitiveField
-    @Convert(converter = StringEncryptionConverter.class)
-    private String blackDuckApiKey;
-    @Column(name = "blackduck_url")
-    private String blackDuckUrl;
+    @Column(name = "description")
+    private String description;
 
-    public GlobalBlackDuckConfigEntity() {
+    @Column(name = "href")
+    private String href;
+
+    @Column(name = "project_owner_email")
+    private String projectOwnerEmail;
+
+    public BlackDuckProjectEntity() {
         // JPA requires default constructor definitions
     }
 
-    public GlobalBlackDuckConfigEntity(final Integer blackDuckTimeout, final String blackDuckApiKey, final String blackDuckUrl) {
-        this.blackDuckTimeout = blackDuckTimeout;
-        this.blackDuckApiKey = blackDuckApiKey;
-        this.blackDuckUrl = blackDuckUrl;
+    public BlackDuckProjectEntity(final String name, final String description, final String href, final String projectOwnerEmail) {
+        this.name = name;
+        this.description = description;
+        this.href = href;
+        this.projectOwnerEmail = projectOwnerEmail;
     }
 
-    public Integer getBlackDuckTimeout() {
-        return blackDuckTimeout;
+    public String getName() {
+        return name;
     }
 
-    public String getBlackDuckApiKey() {
-        return blackDuckApiKey;
+    public String getDescription() {
+        return description;
     }
 
-    public String getBlackDuckUrl() {
-        return blackDuckUrl;
+    public String getHref() {
+        return href;
+    }
+
+    public String getProjectOwnerEmail() {
+        return projectOwnerEmail;
     }
 }

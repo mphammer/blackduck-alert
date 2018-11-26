@@ -15,7 +15,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import com.synopsys.integration.alert.channel.hipchat.mock.MockHipChatEntity;
-import com.synopsys.integration.alert.database.channel.hipchat.HipChatDistributionConfigEntity;
 import com.synopsys.integration.alert.database.entity.EntityTest;
 
 public class HipChatConfigEntityTest extends EntityTest<HipChatDistributionConfigEntity> {

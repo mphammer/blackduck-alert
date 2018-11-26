@@ -10,7 +10,6 @@ import org.junit.Test;
 import com.synopsys.integration.alert.common.model.AggregateMessageContent;
 import com.synopsys.integration.alert.common.model.LinkableItem;
 import com.synopsys.integration.alert.provider.blackduck.BlackDuckProvider;
-import com.synopsys.integration.alert.web.channel.model.HipChatDistributionConfig;
 import com.synopsys.integration.rest.RestConstants;
 
 public class HipChatEventProducerTest {

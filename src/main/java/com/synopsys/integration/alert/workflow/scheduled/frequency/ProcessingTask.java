@@ -48,18 +48,22 @@ public abstract class ProcessingTask extends ScheduledTask {
     private final NotificationManager notificationManager;
     private final NotificationProcessor notificationProcessor;
     private final ChannelTemplateManager channelTemplateManager;
+    private final FrequencyType digestType;
     private ZonedDateTime lastRunTime;
 
     public ProcessingTask(final TaskScheduler taskScheduler, final String taskName, final NotificationManager notificationManager, final NotificationProcessor notificationProcessor,
-        final ChannelTemplateManager channelTemplateManager) {
+        final ChannelTemplateManager channelTemplateManager, final FrequencyType digestType) {
         super(taskScheduler, taskName);
         this.notificationManager = notificationManager;
         this.notificationProcessor = notificationProcessor;
         this.channelTemplateManager = channelTemplateManager;
         lastRunTime = ZonedDateTime.now().withZoneSameInstant(ZoneOffset.UTC);
+        this.digestType = digestType;
     }
 
-    public abstract FrequencyType getDigestType();
+    public FrequencyType getDigestType() {
+        return digestType;
+    }
 
     public ZonedDateTime getLastRunTime() {
         return lastRunTime;

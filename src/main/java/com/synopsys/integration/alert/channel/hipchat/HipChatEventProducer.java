@@ -30,7 +30,6 @@ import org.springframework.stereotype.Component;
 
 import com.synopsys.integration.alert.channel.event.ChannelEventProducer;
 import com.synopsys.integration.alert.common.model.AggregateMessageContent;
-import com.synopsys.integration.alert.web.channel.model.HipChatDistributionConfig;
 import com.synopsys.integration.alert.web.model.CommonDistributionConfig;
 import com.synopsys.integration.rest.RestConstants;
 

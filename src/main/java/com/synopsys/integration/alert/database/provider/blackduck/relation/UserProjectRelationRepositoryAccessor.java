@@ -21,7 +21,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.alert.database.provider.blackduck.data.relation;
+package com.synopsys.integration.alert.database.provider.blackduck.relation;
 
 import java.util.List;
 import java.util.Set;

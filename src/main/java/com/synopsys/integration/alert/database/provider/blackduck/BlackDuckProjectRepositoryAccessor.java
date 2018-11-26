@@ -21,28 +21,42 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.alert.database.channel.hipchat;
+package com.synopsys.integration.alert.database.provider.blackduck;
+
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.synopsys.integration.alert.database.RepositoryAccessor;
 import com.synopsys.integration.alert.database.entity.DatabaseEntity;
 
 @Component
-public class HipChatGlobalRepositoryAccessor extends RepositoryAccessor {
-    private final HipChatGlobalRepository repository;
+@Transactional
+public class BlackDuckProjectRepositoryAccessor extends RepositoryAccessor {
+    private final BlackDuckProjectRepository blackDuckProjectRepository;
 
     @Autowired
-    public HipChatGlobalRepositoryAccessor(final HipChatGlobalRepository repository) {
-        super(repository);
-        this.repository = repository;
+    public BlackDuckProjectRepositoryAccessor(final BlackDuckProjectRepository blackDuckProjectRepository) {
+        super(blackDuckProjectRepository);
+        this.blackDuckProjectRepository = blackDuckProjectRepository;
+    }
+
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
+    public BlackDuckProjectEntity findByName(final String name) {
+        return blackDuckProjectRepository.findByName(name);
     }
 
     @Override
     public DatabaseEntity saveEntity(final DatabaseEntity entity) {
-        final HipChatGlobalConfigEntity hipChatEntity = (HipChatGlobalConfigEntity) entity;
-        return repository.save(hipChatEntity);
+        final BlackDuckProjectEntity blackDuckProjectEntity = (BlackDuckProjectEntity) entity;
+        return blackDuckProjectRepository.save(blackDuckProjectEntity);
     }
 
+    public List<BlackDuckProjectEntity> deleteAndSaveAll(final Iterable<BlackDuckProjectEntity> blackDuckProjectEntities) {
+        blackDuckProjectRepository.deleteAllInBatch();
+        return blackDuckProjectRepository.saveAll(blackDuckProjectEntities);
+    }
 }

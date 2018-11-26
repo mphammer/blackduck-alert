@@ -21,42 +21,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.alert.database.provider.blackduck.data;
+package com.synopsys.integration.alert.database.provider.blackduck;
 
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.synopsys.integration.alert.database.RepositoryAccessor;
 import com.synopsys.integration.alert.database.entity.DatabaseEntity;
 
 @Component
-@Transactional
-public class BlackDuckProjectRepositoryAccessor extends RepositoryAccessor {
-    private final BlackDuckProjectRepository blackDuckProjectRepository;
+public class BlackDuckUserRepositoryAccessor extends RepositoryAccessor {
+    private final BlackDuckUserRepository blackDuckUserRepository;
 
     @Autowired
-    public BlackDuckProjectRepositoryAccessor(final BlackDuckProjectRepository blackDuckProjectRepository) {
-        super(blackDuckProjectRepository);
-        this.blackDuckProjectRepository = blackDuckProjectRepository;
-    }
-
-    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    public BlackDuckProjectEntity findByName(final String name) {
-        return blackDuckProjectRepository.findByName(name);
+    public BlackDuckUserRepositoryAccessor(final BlackDuckUserRepository blackDuckUserRepository) {
+        super(blackDuckUserRepository);
+        this.blackDuckUserRepository = blackDuckUserRepository;
     }
 
     @Override
     public DatabaseEntity saveEntity(final DatabaseEntity entity) {
-        final BlackDuckProjectEntity blackDuckProjectEntity = (BlackDuckProjectEntity) entity;
-        return blackDuckProjectRepository.save(blackDuckProjectEntity);
+        final BlackDuckUserEntity blackDuckUserEntity = (BlackDuckUserEntity) entity;
+        return blackDuckUserRepository.save(blackDuckUserEntity);
     }
 
-    public List<BlackDuckProjectEntity> deleteAndSaveAll(final Iterable<BlackDuckProjectEntity> blackDuckProjectEntities) {
-        blackDuckProjectRepository.deleteAllInBatch();
-        return blackDuckProjectRepository.saveAll(blackDuckProjectEntities);
+    public List<BlackDuckUserEntity> deleteAndSaveAll(final Iterable<BlackDuckUserEntity> userEntitiesToDelete, final Iterable<BlackDuckUserEntity> userEntitiesToAdd) {
+        blackDuckUserRepository.deleteAll(userEntitiesToDelete);
+        return blackDuckUserRepository.saveAll(userEntitiesToAdd);
     }
 }

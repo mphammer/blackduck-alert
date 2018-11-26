@@ -14,7 +14,6 @@ package com.synopsys.integration.alert.channel.hipchat.mock;
 import com.google.gson.JsonObject;
 import com.synopsys.integration.alert.mock.model.MockCommonDistributionRestModel;
 import com.synopsys.integration.alert.mock.model.MockRestModelUtil;
-import com.synopsys.integration.alert.web.channel.model.HipChatDistributionConfig;
 
 public class MockHipChatRestModel extends MockRestModelUtil<HipChatDistributionConfig> {
     private final MockCommonDistributionRestModel distributionMockUtil = new MockCommonDistributionRestModel();

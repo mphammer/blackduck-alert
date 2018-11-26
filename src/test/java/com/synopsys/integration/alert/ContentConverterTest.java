@@ -8,7 +8,6 @@ import org.springframework.core.convert.support.DefaultConversionService;
 import com.google.gson.Gson;
 import com.synopsys.integration.alert.channel.slack.mock.MockSlackRestModel;
 import com.synopsys.integration.alert.common.ContentConverter;
-import com.synopsys.integration.alert.web.channel.model.SlackDistributionConfig;
 
 public class ContentConverterTest {
 

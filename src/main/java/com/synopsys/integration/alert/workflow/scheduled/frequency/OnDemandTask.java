@@ -39,12 +39,8 @@ public class OnDemandTask extends ProcessingTask {
 
     @Autowired
     public OnDemandTask(final TaskScheduler taskScheduler, final NotificationManager notificationManager,
-    final NotificationProcessor notificationProcessor, final ChannelTemplateManager channelTemplateManager) {
-        super(taskScheduler, TASK_NAME, notificationManager, notificationProcessor, channelTemplateManager);
+        final NotificationProcessor notificationProcessor, final ChannelTemplateManager channelTemplateManager) {
+        super(taskScheduler, TASK_NAME, notificationManager, notificationProcessor, channelTemplateManager, FrequencyType.REAL_TIME);
     }
 
-    @Override
-    public FrequencyType getDigestType() {
-        return FrequencyType.REAL_TIME;
-    }
 }

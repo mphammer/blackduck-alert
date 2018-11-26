@@ -42,7 +42,6 @@ import com.synopsys.integration.alert.common.descriptor.config.DescriptorActionA
 import com.synopsys.integration.alert.provider.blackduck.BlackDuckProperties;
 import com.synopsys.integration.alert.web.exception.AlertFieldException;
 import com.synopsys.integration.alert.web.model.Config;
-import com.synopsys.integration.alert.web.provider.blackduck.BlackDuckConfig;
 import com.synopsys.integration.blackduck.configuration.HubServerConfig;
 import com.synopsys.integration.blackduck.configuration.HubServerConfigBuilder;
 import com.synopsys.integration.exception.IntegrationException;

@@ -43,6 +43,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import com.synopsys.integration.alert.workflow.NotificationManager;
 
+// TODO verify whether or not this is used anymore
 public abstract class JobScheduledTask<R extends ItemReader<?>, P extends ItemProcessor<?, ?>, W extends ItemWriter<?>> extends ScheduledTask {
     public static final String JOB_ID_PROPERTY_NAME = "JobID";
     protected final SimpleJobLauncher jobLauncher;
@@ -54,7 +55,7 @@ public abstract class JobScheduledTask<R extends ItemReader<?>, P extends ItemPr
     private final Logger logger = LoggerFactory.getLogger(JobScheduledTask.class);
 
     public JobScheduledTask(final SimpleJobLauncher jobLauncher, final JobBuilderFactory jobBuilderFactory, final StepBuilderFactory stepBuilderFactory, final TaskExecutor taskExecutor,
-            final NotificationManager notificationManager, final PlatformTransactionManager transactionManager, final TaskScheduler taskScheduler, final String taskName) {
+        final NotificationManager notificationManager, final PlatformTransactionManager transactionManager, final TaskScheduler taskScheduler, final String taskName) {
         super(taskScheduler, taskName);
         this.jobLauncher = jobLauncher;
         this.jobBuilderFactory = jobBuilderFactory;

@@ -21,28 +21,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.alert.database.channel.email;
+package com.synopsys.integration.alert.database.provider.blackduck.relation;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import java.util.List;
 
-import com.synopsys.integration.alert.database.RepositoryAccessor;
-import com.synopsys.integration.alert.database.entity.DatabaseEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-@Component
-public class EmailGlobalRepositoryAccessor extends RepositoryAccessor {
-    private final EmailGlobalRepository repository;
+public interface UserProjectRelationRepository extends JpaRepository<UserProjectRelation, UserProjectRelationPK> {
+    public List<UserProjectRelation> findByBlackDuckUserId(final Long blackDuckUserId);
 
-    @Autowired
-    public EmailGlobalRepositoryAccessor(final EmailGlobalRepository repository) {
-        super(repository);
-        this.repository = repository;
-    }
-
-    @Override
-    public DatabaseEntity saveEntity(final DatabaseEntity entity) {
-        final EmailGlobalConfigEntity emailEntity = (EmailGlobalConfigEntity) entity;
-        return repository.save(emailEntity);
-    }
+    public List<UserProjectRelation> findByBlackDuckProjectId(final Long blackDuckProjectId);
 
 }

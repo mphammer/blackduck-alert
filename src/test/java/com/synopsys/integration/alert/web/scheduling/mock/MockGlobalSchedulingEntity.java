@@ -14,7 +14,6 @@ package com.synopsys.integration.alert.web.scheduling.mock;
 import com.google.gson.JsonObject;
 import com.synopsys.integration.alert.database.scheduling.SchedulingConfigEntity;
 import com.synopsys.integration.alert.mock.MockGlobalEntityUtil;
-import com.synopsys.integration.alert.web.component.scheduling.SchedulingConfig;
 import com.synopsys.integration.alert.web.model.Config;
 
 public class MockGlobalSchedulingEntity extends MockGlobalEntityUtil<SchedulingConfigEntity> {

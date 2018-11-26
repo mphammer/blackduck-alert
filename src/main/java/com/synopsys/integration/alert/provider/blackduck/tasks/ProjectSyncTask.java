@@ -40,12 +40,12 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
 
 import com.synopsys.integration.alert.common.exception.AlertRuntimeException;
-import com.synopsys.integration.alert.database.provider.blackduck.data.BlackDuckProjectEntity;
-import com.synopsys.integration.alert.database.provider.blackduck.data.BlackDuckProjectRepositoryAccessor;
-import com.synopsys.integration.alert.database.provider.blackduck.data.BlackDuckUserEntity;
-import com.synopsys.integration.alert.database.provider.blackduck.data.BlackDuckUserRepositoryAccessor;
-import com.synopsys.integration.alert.database.provider.blackduck.data.relation.UserProjectRelation;
-import com.synopsys.integration.alert.database.provider.blackduck.data.relation.UserProjectRelationRepositoryAccessor;
+import com.synopsys.integration.alert.database.provider.blackduck.BlackDuckProjectEntity;
+import com.synopsys.integration.alert.database.provider.blackduck.BlackDuckProjectRepositoryAccessor;
+import com.synopsys.integration.alert.database.provider.blackduck.BlackDuckUserEntity;
+import com.synopsys.integration.alert.database.provider.blackduck.BlackDuckUserRepositoryAccessor;
+import com.synopsys.integration.alert.database.provider.blackduck.relation.UserProjectRelation;
+import com.synopsys.integration.alert.database.provider.blackduck.relation.UserProjectRelationRepositoryAccessor;
 import com.synopsys.integration.alert.provider.blackduck.BlackDuckProperties;
 import com.synopsys.integration.alert.provider.blackduck.model.BlackDuckProject;
 import com.synopsys.integration.alert.workflow.scheduled.ScheduledTask;
@@ -77,6 +77,7 @@ public class ProjectSyncTask extends ScheduledTask {
         this.userProjectRelationRepositoryAccessor = userProjectRelationRepositoryAccessor;
     }
 
+    @Override
     public void run() {
         logger.info("### Starting {}...", getTaskName());
         try {
@@ -108,7 +109,7 @@ public class ProjectSyncTask extends ScheduledTask {
         logger.info("### Finished {}...", getTaskName());
     }
 
-    public Map<BlackDuckProject, ProjectView> getCurrentData(final List<ProjectView> projectViews, HubService hubService) {
+    public Map<BlackDuckProject, ProjectView> getCurrentData(final List<ProjectView> projectViews, final HubService hubService) {
         final Map<BlackDuckProject, ProjectView> projectMap = new ConcurrentHashMap<>();
         projectViews
             .parallelStream()
@@ -116,9 +117,9 @@ public class ProjectSyncTask extends ScheduledTask {
                 String projectOwnerEmail = null;
                 if (StringUtils.isNotBlank(projectView.projectOwner)) {
                     try {
-                        UserView projectOwner = hubService.getResponse(projectView.projectOwner, UserView.class);
+                        final UserView projectOwner = hubService.getResponse(projectView.projectOwner, UserView.class);
                         projectOwnerEmail = projectOwner.email;
-                    } catch (IntegrationException e) {
+                    } catch (final IntegrationException e) {
                         logger.error(String.format("Could not get the project owner for Project: %s. Error: %s", projectView.name, e.getMessage()), e);
                     }
                 }

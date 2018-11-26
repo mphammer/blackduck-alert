@@ -44,9 +44,7 @@ import com.synopsys.integration.alert.common.descriptor.ProviderDescriptor;
 import com.synopsys.integration.alert.common.enumeration.SystemMessageType;
 import com.synopsys.integration.alert.common.provider.Provider;
 import com.synopsys.integration.alert.common.security.EncryptionUtility;
-import com.synopsys.integration.alert.database.provider.blackduck.GlobalBlackDuckConfigEntity;
 import com.synopsys.integration.alert.database.scheduling.SchedulingConfigEntity;
-import com.synopsys.integration.alert.database.scheduling.SchedulingRepository;
 import com.synopsys.integration.alert.database.system.SystemMessageUtility;
 import com.synopsys.integration.alert.database.system.SystemStatusUtility;
 import com.synopsys.integration.alert.provider.blackduck.BlackDuckProperties;
@@ -63,7 +61,6 @@ import com.synopsys.integration.rest.proxy.ProxyInfoBuilder;
 public class StartupManager {
     private final Logger logger = LoggerFactory.getLogger(StartupManager.class);
 
-    private final SchedulingRepository schedulingRepository;
     private final AlertProperties alertProperties;
     private final BlackDuckProperties blackDuckProperties;
     private final DailyTask dailyTask;
@@ -72,50 +69,39 @@ public class StartupManager {
     private final PhoneHomeTask phoneHomeTask;
     private final AlertStartupInitializer alertStartupInitializer;
     private final List<ProviderDescriptor> providerDescriptorList;
-
-    @Value("${logging.level.com.blackducksoftware.integration:}")
-    private String loggingLevel;
-
-    // SSL properties
-    @Value("${server.port:")
-    private String serverPort;
-
-    @Value("${server.ssl.key-store:}")
-    private String keyStoreFile;
-
-    @Value("${server.ssl.key-store-password:}")
-    private String keyStorePass;
-
-    @Value("${server.ssl.keyStoreType:}")
-    private String keyStoreType;
-
-    @Value("${server.ssl.keyAlias:}")
-    private String keyAlias;
-
-    @Value("${server.ssl.trust-store:}")
-    private String trustStoreFile;
-
-    @Value("${server.ssl.trust-store-password:}")
-    private String trustStorePass;
-
-    @Value("${server.ssl.trustStoreType:}")
-    private String trustStoreType;
-
     private final EncryptionUtility encryptionUtility;
     private final SystemStatusUtility systemStatusUtility;
     private final SystemMessageUtility systemMessageUtility;
+    @Value("${logging.level.com.blackducksoftware.integration:}")
+    private String loggingLevel;
+    // SSL properties
+    @Value("${server.port:")
+    private String serverPort;
+    @Value("${server.ssl.key-store:}")
+    private String keyStoreFile;
+    @Value("${server.ssl.key-store-password:}")
+    private String keyStorePass;
+    @Value("${server.ssl.keyStoreType:}")
+    private String keyStoreType;
+    @Value("${server.ssl.keyAlias:}")
+    private String keyAlias;
+    @Value("${server.ssl.trust-store:}")
+    private String trustStoreFile;
+    @Value("${server.ssl.trust-store-password:}")
+    private String trustStorePass;
+    @Value("${server.ssl.trustStoreType:}")
+    private String trustStoreType;
 
     @Autowired
-    public StartupManager(final SchedulingRepository schedulingRepository, final AlertProperties alertProperties, final BlackDuckProperties blackDuckProperties,
+    public StartupManager(final AlertProperties alertProperties, final BlackDuckProperties blackDuckProperties,
         final DailyTask dailyTask, final OnDemandTask onDemandTask, final PurgeTask purgeTask, final PhoneHomeTask phoneHometask, final AlertStartupInitializer alertStartupInitializer,
         final List<ProviderDescriptor> providerDescriptorList, final EncryptionUtility encryptionUtility, final SystemStatusUtility systemStatusUtility, final SystemMessageUtility systemMessageUtility) {
-        this.schedulingRepository = schedulingRepository;
         this.alertProperties = alertProperties;
         this.blackDuckProperties = blackDuckProperties;
         this.dailyTask = dailyTask;
         this.onDemandTask = onDemandTask;
         this.purgeTask = purgeTask;
-        this.phoneHomeTask = phoneHometask;
+        phoneHomeTask = phoneHometask;
         this.alertStartupInitializer = alertStartupInitializer;
         this.providerDescriptorList = providerDescriptorList;
         this.encryptionUtility = encryptionUtility;
