@@ -94,7 +94,7 @@ public class LoginActions {
             final Map<String, String> fieldErrorMap = afex.getFieldErrors();
             fieldErrorMap.keySet().forEach(key -> {
                 final String value = fieldErrorMap.get(key);
-                logger.error(String.format("FieldValuesEntity Error %s - %s", key, value));
+                logger.error(String.format("Field Error %s - %s", key, value));
             });
             logger.info("User not authenticated");
             logger.debug(afex.getMessage(), afex);
