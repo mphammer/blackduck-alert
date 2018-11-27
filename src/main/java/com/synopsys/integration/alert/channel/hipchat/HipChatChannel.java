@@ -80,64 +80,34 @@ public class HipChatChannel extends RestDistributionChannel {
     }
 
     @Override
-    public String getApiUrl(final CommonDistributionFields commonDistributionFields) throws AlertException {
-        final String apiKey = commonDistributionFields.getStringValue(HipChatGlobalUIConfig.KEY_API_KEY);
-        if (StringUtils.isBlank(apiKey)) {
-            throw new AlertException("ERROR: Missing global config.");
-        }
-        String hipChatHostServer = HIP_CHAT_API;
-        final String apiUrl = commonDistributionFields.getStringValue(HipChatGlobalUIConfig.KEY_HOST_SERVER);
-        if (StringUtils.isNotBlank(apiUrl)) {
-            hipChatHostServer = apiUrl;
-        }
-        return hipChatHostServer;
+    public String getApiUrl(final CommonDistributionFields commonDistributionFields) {
+        final String hostServer = commonDistributionFields.getStringValue(HipChatGlobalUIConfig.KEY_HOST_SERVER);
+        return getConfiguredApiUrl(hostServer);
     }
 
     @Override
     public String testGlobalConfig(final FieldEntityWrapper fieldEntityWrapper) throws IntegrationException {
         if (fieldEntityWrapper == null) {
-            return "The provided config was null.";
+            throw new AlertException("The provided config was null.");
         }
 
-        final CommonDistributionFields commonDistributionFields = new CommonDistributionFields(fieldEntityWrapper);
+        final String hostServer = fieldEntityWrapper.getStringValue(HipChatGlobalUIConfig.KEY_HOST_SERVER);
+        final String configuredApiUrl = getConfiguredApiUrl(hostServer);
 
         final String apiKey = fieldEntityWrapper.getStringValue(HipChatGlobalUIConfig.KEY_API_KEY);
-        final String hostServer = getApiUrl(commonDistributionFields);
+        try (final RestConnection restConnection = getChannelRestConnectionFactory().createUnauthenticatedRestConnection(configuredApiUrl)) {
+            final String testResult = testApiKeyAndApiUrlConnection(restConnection, configuredApiUrl, apiKey);
+            final String roomId = fieldEntityWrapper.getStringValue(HipChatDistributionUIConfig.KEY_ROOM_ID);
+            final Boolean notify = Boolean.parseBoolean(fieldEntityWrapper.getStringValue(HipChatDistributionUIConfig.KEY_NOTIFY));
+            final String color = fieldEntityWrapper.getStringValue(HipChatDistributionUIConfig.KEY_COLOR);
 
-        if (StringUtils.isBlank(apiKey)) {
-            throw new AlertException("Invalid API key: API key not provided");
+            final String htmlMessage = "This is a test message sent by Alert.";
+            final Request testRequest = createRequest(hostServer, apiKey, roomId, notify, color, htmlMessage);
+            sendMessageRequest(restConnection, testRequest, "test");
+            return testResult;
+        } catch (final IOException ex) {
+            throw new AlertException("Connection error: see logs for more information.");
         }
-        final RestConnection restConnection = getChannelRestConnectionFactory().createUnauthenticatedRestConnection(hostServer);
-        if (restConnection != null) {
-            try {
-                final String url = hostServer + "/v2/room/*/notification";
-                final Map<String, Set<String>> queryParameters = new HashMap<>();
-                queryParameters.put("auth_test", new HashSet<>(Arrays.asList("true")));
-
-                final Map<String, String> requestHeaders = new HashMap<>();
-                requestHeaders.put("Authorization", "Bearer " + apiKey);
-                requestHeaders.put("Content-Type", "application/json");
-
-                // The {"message":"test"} is required to avoid a BAD_REQUEST (OkHttp issue: #854)
-                final Request request = createPostMessageRequest(url, requestHeaders, queryParameters, "{\"message\":\"test\"}");
-
-                final Response response = sendGenericRequest(restConnection, request);
-                if (response.getStatusCode() >= 200 && response.getStatusCode() < 400) {
-                    return "API key is valid.";
-                }
-                return "Invalid API key: " + response.getStatusMessage();
-            } catch (final IntegrationException e) {
-                logger.error("Unable to create a response", e);
-                throw new IntegrationException("Invalid API key: " + e.getMessage());
-            } finally {
-                try {
-                    restConnection.close();
-                } catch (final IOException ex) {
-                    // close the connection quietly
-                }
-            }
-        }
-        return "Connection error: see logs for more information.";
     }
 
     @Override
@@ -163,6 +133,43 @@ public class HipChatChannel extends RestDistributionChannel {
                 return Arrays.asList(createRequest(apiKey, hostServer, roomId, notify, color, htmlMessage));
             }
         }
+    }
+
+    private String testApiKeyAndApiUrlConnection(final RestConnection restConnection, final String configuredApiUrl, final String apiKey) throws IntegrationException {
+        if (StringUtils.isBlank(apiKey)) {
+            throw new AlertException("Invalid API key: API key not provided");
+        }
+        if (restConnection == null) {
+            throw new AlertException("Connection error: see logs for more information.");
+        }
+        try {
+            final String url = configuredApiUrl + "/v2/room/*/notification";
+            final Map<String, Set<String>> queryParameters = new HashMap<>();
+            queryParameters.put("auth_test", new HashSet<>(Arrays.asList("true")));
+
+            final Map<String, String> requestHeaders = new HashMap<>();
+            requestHeaders.put("Authorization", "Bearer " + apiKey);
+            requestHeaders.put("Content-Type", "application/json");
+
+            // TODO test if this string is still needed
+            // The {"message":"test"} is required to avoid a BAD_REQUEST (OkHttp issue: #854)
+            final Request request = createPostMessageRequest(url, requestHeaders, queryParameters, "{\"message\":\"test\"}");
+            final Response response = sendGenericRequest(restConnection, request);
+            if (200 <= response.getStatusCode() && response.getStatusCode() < 400) {
+                return "API key is valid.";
+            }
+            throw new AlertException("Invalid API key: " + response.getStatusMessage());
+        } catch (final IntegrationException e) {
+            logger.error("Unable to create a response", e);
+            throw new AlertException("Invalid API key: " + e.getMessage());
+        }
+    }
+
+    private String getConfiguredApiUrl(final String configuredUrl) {
+        if (StringUtils.isBlank(configuredUrl)) {
+            return HIP_CHAT_API;
+        }
+        return configuredUrl.trim();
     }
 
     private boolean isChunkedMessageNeeded(final String htmlMessage) {

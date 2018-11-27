@@ -44,8 +44,8 @@ public class SlackDistributionDescriptorActionApi extends DescriptorActionApi {
 
     @Override
     public void validateConfig(final CommonDistributionFields commonDistributionFields, final Map<String, String> fieldErrors) {
-        final String webhook = commonDistributionFields.getStringValue(SlackChannel.KEY_WEBHOOK);
-        final String channelName = commonDistributionFields.getStringValue(SlackChannel.KEY_CHANNEL_NAME);
+        final String webhook = commonDistributionFields.getStringValue(SlackUIConfig.KEY_WEBHOOK);
+        final String channelName = commonDistributionFields.getStringValue(SlackUIConfig.KEY_CHANNEL_NAME);
         if (StringUtils.isBlank(webhook)) {
             fieldErrors.put("webhook", "A webhook is required.");
         }

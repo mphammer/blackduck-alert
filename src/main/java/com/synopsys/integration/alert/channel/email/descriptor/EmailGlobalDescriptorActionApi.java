@@ -33,6 +33,7 @@ import com.synopsys.integration.alert.channel.email.EmailGroupChannel;
 import com.synopsys.integration.alert.common.descriptor.config.DescriptorActionApi;
 import com.synopsys.integration.alert.database.channel.email.EmailGlobalRepositoryAccessor;
 import com.synopsys.integration.alert.web.model.Config;
+import com.synopsys.integration.alert.web.model.TestConfigModel;
 import com.synopsys.integration.exception.IntegrationException;
 
 @Component
@@ -42,7 +43,7 @@ public class EmailGlobalDescriptorActionApi extends DescriptorActionApi {
 
     @Autowired
     public EmailGlobalDescriptorActionApi(final EmailGlobalTypeConverter databaseContentConverter, final EmailGlobalRepositoryAccessor repositoryAccessor, final EmailGlobalStartupComponent startupComponent,
-        final EmailGroupChannel emailGroupChannel) {
+            final EmailGroupChannel emailGroupChannel) {
         super(databaseContentConverter, repositoryAccessor, startupComponent);
         this.emailGroupChannel = emailGroupChannel;
     }
@@ -64,8 +65,8 @@ public class EmailGlobalDescriptorActionApi extends DescriptorActionApi {
     }
 
     @Override
-    public void testConfig(final Config restModel) throws IntegrationException {
-        emailGroupChannel.testGlobalConfig(restModel);
+    public void testConfig(final TestConfigModel testConfig) throws IntegrationException {
+        emailGroupChannel.testGlobalConfig(testConfig);
     }
 
 }

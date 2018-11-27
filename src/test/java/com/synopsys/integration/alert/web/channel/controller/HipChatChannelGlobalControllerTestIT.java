@@ -37,4 +37,9 @@ public class HipChatChannelGlobalControllerTestIT extends GlobalControllerTest {
         return mockGlobalConfig.createGlobalRestModel();
     }
 
+    @Override
+    public String getTestDestination() {
+        return testProperties.getProperty(TestPropertyKey.TEST_HIPCHAT_ROOM_ID);
+    }
+
 }
