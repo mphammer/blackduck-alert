@@ -23,36 +23,28 @@
  */
 package com.synopsys.integration.alert.common.descriptor.config;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
-import com.synopsys.integration.alert.database.RepositoryAccessor;
-import com.synopsys.integration.alert.database.entity.DatabaseEntity;
-import com.synopsys.integration.alert.web.model.Config;
+import com.synopsys.integration.alert.channel.DistributionChannel;
+import com.synopsys.integration.alert.channel.event.DistributionEvent;
+import com.synopsys.integration.alert.common.field.CommonDistributionFields;
 import com.synopsys.integration.exception.IntegrationException;
 
 public abstract class DescriptorActionApi {
-    private final TypeConverter typeConverter;
-    private final RepositoryAccessor repositoryAccessor;
+    private final DistributionChannel distributionChannel;
     private final StartupComponent startupComponent;
 
-    public DescriptorActionApi(final TypeConverter typeConverter, final RepositoryAccessor repositoryAccessor) {
-        this(typeConverter, repositoryAccessor, null);
+    public DescriptorActionApi(final DistributionChannel distributionChannel) {
+        this(distributionChannel, null);
     }
 
-    public DescriptorActionApi(final TypeConverter typeConverter, final RepositoryAccessor repositoryAccessor, final StartupComponent startupComponent) {
-        this.typeConverter = typeConverter;
-        this.repositoryAccessor = repositoryAccessor;
+    public DescriptorActionApi(final DistributionChannel distributionChannel, final StartupComponent startupComponent) {
+        this.distributionChannel = distributionChannel;
         this.startupComponent = startupComponent;
     }
 
-    public TypeConverter getTypeConverter() {
-        return typeConverter;
-    }
-
-    public RepositoryAccessor getRepositoryAccessor() {
-        return repositoryAccessor;
+    public DistributionChannel getDistributionChannel() {
+        return distributionChannel;
     }
 
     public StartupComponent getStartupComponent() {
@@ -63,36 +55,13 @@ public abstract class DescriptorActionApi {
         return getStartupComponent() != null;
     }
 
-    public abstract void validateConfig(Config restModel, Map<String, String> fieldErrors);
+    public abstract void validateConfig(CommonDistributionFields commonDistributionFields, Map<String, String> fieldErrors);
 
-    public abstract void testConfig(Config restModel) throws IntegrationException;
+    public abstract DistributionEvent createTestEvent(CommonDistributionFields commonDistributionFields);
 
-    public Optional<? extends DatabaseEntity> readEntity(final long id) {
-        return getRepositoryAccessor().readEntity(id);
-    }
-
-    public List<? extends DatabaseEntity> readEntities() {
-        return getRepositoryAccessor().readEntities();
-    }
-
-    public DatabaseEntity saveEntity(final DatabaseEntity entity) {
-        return getRepositoryAccessor().saveEntity(entity);
-    }
-
-    public void deleteEntity(final long id) {
-        getRepositoryAccessor().deleteEntity(id);
-    }
-
-    public DatabaseEntity populateEntityFromConfig(final Config config) {
-        return getTypeConverter().populateEntityFromConfig(config);
-    }
-
-    public Config populateConfigFromEntity(final DatabaseEntity entity) {
-        return getTypeConverter().populateConfigFromEntity(entity);
-    }
-
-    public Config getConfigFromJson(final String json) {
-        return getTypeConverter().getConfigFromJson(json);
+    public void testConfig(final CommonDistributionFields commonDistributionFields) throws IntegrationException {
+        final DistributionEvent event = createTestEvent(commonDistributionFields);
+        distributionChannel.sendMessage(event);
     }
 
 }

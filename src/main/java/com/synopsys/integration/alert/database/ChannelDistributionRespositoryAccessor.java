@@ -28,7 +28,6 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.synopsys.integration.alert.database.entity.DatabaseEntity;
-import com.synopsys.integration.alert.web.model.CommonDistributionConfig;
 
 public abstract class ChannelDistributionRespositoryAccessor extends RepositoryAccessor {
     public ChannelDistributionRespositoryAccessor(final JpaRepository<? extends DatabaseEntity, Long> repository) {

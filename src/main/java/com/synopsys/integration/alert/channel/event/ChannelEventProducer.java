@@ -24,17 +24,30 @@
 package com.synopsys.integration.alert.channel.event;
 
 import java.util.Collections;
+import java.util.Date;
 
+import org.springframework.stereotype.Component;
+
+import com.synopsys.integration.alert.common.field.CommonDistributionFields;
 import com.synopsys.integration.alert.common.model.AggregateMessageContent;
 import com.synopsys.integration.alert.common.model.LinkableItem;
 import com.synopsys.integration.alert.web.exception.AlertFieldException;
-import com.synopsys.integration.alert.web.model.CommonDistributionConfig;
+import com.synopsys.integration.rest.RestConstants;
 
-public abstract class ChannelEventProducer {
+@Component
+public class ChannelEventProducer {
 
-    public abstract DistributionEvent createChannelEvent(final CommonDistributionConfig commmonDistributionConfig, final AggregateMessageContent messageContent);
+    public DistributionEvent createChannelEvent(final CommonDistributionFields commonDistributionConfig, final AggregateMessageContent messageContent) {
+        final String channelName = commonDistributionConfig.getDistributionType();
+        final String createdAt = RestConstants.formatDate(new Date());
+        final String provider = commonDistributionConfig.getProviderName();
+        final String formatType = commonDistributionConfig.getFormatType().name();
+        return new DistributionEvent(channelName, createdAt, provider, formatType, messageContent, commonDistributionConfig);
+    }
 
-    public abstract DistributionEvent createChannelTestEvent(final CommonDistributionConfig commmonDistributionConfig) throws AlertFieldException;
+    public DistributionEvent createChannelTestEvent(final CommonDistributionFields commmonDistributionConfig) throws AlertFieldException {
+        return null;
+    }
 
     public AggregateMessageContent createTestNotificationContent() {
         final LinkableItem subTopic = new LinkableItem("subTopic", "Alert has sent this test message", null);

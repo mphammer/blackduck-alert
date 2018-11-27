@@ -30,16 +30,14 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.google.gson.Gson;
 import com.synopsys.integration.alert.channel.DistributionChannel;
 import com.synopsys.integration.alert.channel.event.DistributionEvent;
 import com.synopsys.integration.alert.common.AlertProperties;
 import com.synopsys.integration.alert.common.exception.AlertException;
+import com.synopsys.integration.alert.common.field.CommonDistributionFields;
 import com.synopsys.integration.alert.database.audit.AuditUtility;
-import com.synopsys.integration.alert.database.entity.channel.DistributionChannelConfigEntity;
-import com.synopsys.integration.alert.database.entity.channel.GlobalChannelConfigEntity;
 import com.synopsys.integration.alert.provider.blackduck.BlackDuckProperties;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.HttpMethod;
@@ -50,21 +48,20 @@ import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.request.Response;
 
 // TODO this class should not be part of the hierarchy. It should be used as a helper class to help use rest and all channels should extends DistributionChannel
-public abstract class RestDistributionChannel<G extends GlobalChannelConfigEntity, C extends DistributionChannelConfigEntity, E extends DistributionEvent> extends DistributionChannel<G, E> {
+public abstract class RestDistributionChannel extends DistributionChannel {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final ChannelRestConnectionFactory channelRestConnectionFactory;
 
-    public RestDistributionChannel(final Gson gson, final AlertProperties alertProperties, final BlackDuckProperties blackDuckProperties, final AuditUtility auditUtility, final JpaRepository<G, Long> globalRepository,
-        final Class eventClass, final ChannelRestConnectionFactory channelRestConnectionFactory) {
-        super(gson, alertProperties, blackDuckProperties, auditUtility, globalRepository, eventClass);
+    public RestDistributionChannel(final Gson gson, final AlertProperties alertProperties, final BlackDuckProperties blackDuckProperties, final AuditUtility auditUtility, final ChannelRestConnectionFactory channelRestConnectionFactory) {
+        super(gson, alertProperties, blackDuckProperties, auditUtility);
         this.channelRestConnectionFactory = channelRestConnectionFactory;
     }
 
     @Override
-    public void sendMessage(final E event) throws IntegrationException {
-        final G globalConfig = getGlobalConfigEntity();
-        try (final RestConnection restConnection = channelRestConnectionFactory.createUnauthenticatedRestConnection(getApiUrl(globalConfig))) {
-            final List<Request> requests = createRequests(globalConfig, event);
+    public void sendMessage(final DistributionEvent event) throws IntegrationException {
+        final CommonDistributionFields commonDistributionFields = event.getCommonDistributionFields();
+        try (final RestConnection restConnection = channelRestConnectionFactory.createUnauthenticatedRestConnection(getApiUrl(commonDistributionFields))) {
+            final List<Request> requests = createRequests(event);
             for (final Request request : requests) {
                 sendMessageRequest(restConnection, request, event.getDestination());
             }
@@ -112,10 +109,8 @@ public abstract class RestDistributionChannel<G extends GlobalChannelConfigEntit
         return channelRestConnectionFactory;
     }
 
-    public abstract String getApiUrl(G globalConfig) throws AlertException;
+    public abstract String getApiUrl(CommonDistributionFields commonDistributionFields) throws AlertException;
 
-    public abstract String getApiUrl(String apiUrl);
-
-    public abstract List<Request> createRequests(G globalConfig, final E event) throws IntegrationException;
+    public abstract List<Request> createRequests(final DistributionEvent event) throws IntegrationException;
 
 }

@@ -25,14 +25,17 @@ package com.synopsys.integration.alert.database.field;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.synopsys.integration.alert.database.field.repository.FieldValuesEntityRepository;
 import com.synopsys.integration.alert.database.field.repository.GroupingEntityRepository;
 
 @Component
+@Transactional
 public class FieldAccessor {
     private final FieldValuesEntityRepository fieldValuesEntityRepository;
     private final GroupingEntityRepository groupingEntityRepository;
@@ -74,5 +77,16 @@ public class FieldAccessor {
     public void deleteGroupingAndFieldsById(final Long groupingId) {
         fieldValuesEntityRepository.deleteByGroupingId(groupingId);
         groupingEntityRepository.deleteById(groupingId);
+    }
+
+    public FieldEntityWrapper createFieldEntityWrapperFromGrouping(final GroupingEntity groupingEntity) {
+        final Collection<FieldValuesEntity> fieldValuesEntities = findFieldsOfGrouping(groupingEntity.getId());
+        return new FieldEntityWrapper(groupingEntity, fieldValuesEntities);
+    }
+
+    public Collection<FieldEntityWrapper> createFieldEntityWrappersFromGroupings(final Collection<GroupingEntity> groupingEntities) {
+        return groupingEntities.stream()
+                   .map(groupingEntity -> createFieldEntityWrapperFromGrouping(groupingEntity))
+                   .collect(Collectors.toList());
     }
 }

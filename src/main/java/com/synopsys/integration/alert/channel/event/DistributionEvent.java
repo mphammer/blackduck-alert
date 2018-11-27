@@ -24,19 +24,20 @@
 package com.synopsys.integration.alert.channel.event;
 
 import com.synopsys.integration.alert.common.event.ContentEvent;
+import com.synopsys.integration.alert.common.field.CommonDistributionFields;
 import com.synopsys.integration.alert.common.model.AggregateMessageContent;
 
-public abstract class DistributionEvent extends ContentEvent {
-    private final Long commonDistributionConfigId;
+public class DistributionEvent extends ContentEvent {
+    private final CommonDistributionFields commonDistributionFields;
     private Long auditEntryId;
 
-    public DistributionEvent(final String destination, final String createdAt, final String provider, final String formatType, final AggregateMessageContent content, final Long commonDistributionConfigId) {
+    public DistributionEvent(final String destination, final String createdAt, final String provider, final String formatType, final AggregateMessageContent content, final CommonDistributionFields commonDistributionFields) {
         super(destination, createdAt, provider, formatType, content);
-        this.commonDistributionConfigId = commonDistributionConfigId;
+        this.commonDistributionFields = commonDistributionFields;
     }
 
-    public Long getCommonDistributionConfigId() {
-        return commonDistributionConfigId;
+    public Long getGroupingId() {
+        return commonDistributionFields.getGroupingId();
     }
 
     public Long getAuditEntryId() {
@@ -47,4 +48,7 @@ public abstract class DistributionEvent extends ContentEvent {
         this.auditEntryId = auditEntryId;
     }
 
+    public CommonDistributionFields getCommonDistributionFields() {
+        return commonDistributionFields;
+    }
 }

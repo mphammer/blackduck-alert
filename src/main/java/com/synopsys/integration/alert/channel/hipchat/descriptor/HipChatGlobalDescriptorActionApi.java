@@ -29,33 +29,29 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.synopsys.integration.alert.channel.event.DistributionEvent;
 import com.synopsys.integration.alert.channel.hipchat.HipChatChannel;
 import com.synopsys.integration.alert.common.descriptor.config.DescriptorActionApi;
-import com.synopsys.integration.alert.web.model.Config;
-import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.alert.common.field.CommonDistributionFields;
 
 @Component
 public class HipChatGlobalDescriptorActionApi extends DescriptorActionApi {
-    private final HipChatChannel hipChatChannel;
 
     @Autowired
-    public HipChatGlobalDescriptorActionApi(final HipChatGlobalTypeConverter databaseContentConverter, final HipChatGlobalRepositoryAccessor repositoryAccessor, final HipChatChannel hipChatChannel,
-        final HipChatStartupComponent hipChatStartupComponent) {
-        super(databaseContentConverter, repositoryAccessor, hipChatStartupComponent);
-        this.hipChatChannel = hipChatChannel;
+    public HipChatGlobalDescriptorActionApi(final HipChatChannel hipChatChannel, final HipChatStartupComponent hipChatStartupComponent) {
+        super(hipChatChannel, hipChatStartupComponent);
     }
 
     @Override
-    public void validateConfig(final Config restModel, final Map<String, String> fieldErrors) {
-        final HipChatGlobalConfig hipChatRestModel = (HipChatGlobalConfig) restModel;
-        if (StringUtils.isBlank(hipChatRestModel.getApiKey())) {
+    public void validateConfig(final CommonDistributionFields commonDistributionFields, final Map<String, String> fieldErrors) {
+        final String apiKey = commonDistributionFields.getStringValue(HipChatGlobalUIConfig.KEY_API_KEY);
+        if (StringUtils.isBlank(apiKey)) {
             fieldErrors.put("apiKey", "ApiKey can't be blank");
         }
     }
 
     @Override
-    public void testConfig(final Config restModel) throws IntegrationException {
-        hipChatChannel.testGlobalConfig(restModel);
+    public DistributionEvent createTestEvent(final CommonDistributionFields commonDistributionFields) {
+        return null;
     }
-
 }

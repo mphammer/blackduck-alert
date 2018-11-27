@@ -9,7 +9,6 @@ import com.synopsys.integration.alert.channel.hipchat.mock.MockHipChatGlobalEnti
 import com.synopsys.integration.alert.channel.hipchat.mock.MockHipChatRestModel;
 import com.synopsys.integration.alert.database.entity.DatabaseEntity;
 import com.synopsys.integration.alert.web.controller.ControllerTest;
-import com.synopsys.integration.alert.web.model.CommonDistributionConfig;
 
 public class HipChatChannelDistributionControllerTestIT extends ControllerTest {
 

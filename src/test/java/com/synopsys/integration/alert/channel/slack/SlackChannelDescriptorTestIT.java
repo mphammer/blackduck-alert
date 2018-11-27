@@ -44,7 +44,7 @@ public class SlackChannelDescriptorTestIT extends DescriptorTestConfigTest<Slack
 
         final SlackChannelEvent channelEvent = channelEventProducer.createChannelEvent(slackDistributionConfig, content);
 
-        assertEquals(Long.valueOf(1L), channelEvent.getCommonDistributionConfigId());
+        assertEquals(Long.valueOf(1L), channelEvent.getGroupingId());
         assertEquals(36, channelEvent.getEventId().length());
         assertEquals(getDescriptor().getDestinationName(), channelEvent.getDestination());
         assertEquals(webhook, channelEvent.getWebHook());

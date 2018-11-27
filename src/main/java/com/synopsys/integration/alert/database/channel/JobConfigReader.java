@@ -23,65 +23,48 @@
  */
 package com.synopsys.integration.alert.database.channel;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.synopsys.integration.alert.common.descriptor.DescriptorMap;
-import com.synopsys.integration.alert.database.entity.CommonDistributionConfigEntity;
-import com.synopsys.integration.alert.web.model.CommonDistributionConfig;
+import com.synopsys.integration.alert.common.enumeration.DescriptorType;
+import com.synopsys.integration.alert.common.field.CommonDistributionFields;
+import com.synopsys.integration.alert.database.field.FieldAccessor;
+import com.synopsys.integration.alert.database.field.FieldEntityWrapper;
+import com.synopsys.integration.alert.database.field.GroupingEntity;
 
 @Component
 public class JobConfigReader {
-    private final CommonDistributionRepository commonDistributionRepository;
-    private final DescriptorMap descriptorMap;
+    private final FieldAccessor fieldAccessor;
 
     @Autowired
-    public JobConfigReader(final CommonDistributionRepository commonDistributionRepository, final DescriptorMap descriptorMap) {
-        this.commonDistributionRepository = commonDistributionRepository;
-        this.descriptorMap = descriptorMap;
+    public JobConfigReader(final FieldAccessor fieldAccessor) {
+        this.fieldAccessor = fieldAccessor;
     }
 
-    @Transactional
-    public List<? extends CommonDistributionConfig> getPopulatedConfigs() {
-        final List<CommonDistributionConfigEntity> foundEntities = commonDistributionRepository.findAll();
-
-        final List<? extends CommonDistributionConfig> configs = foundEntities
-                                                                     .stream()
-                                                                     .map(entity -> {
-                                                                         final Optional<? extends CommonDistributionConfig> optionalCommonDistributionConfig = getJobConfig(entity.getDistributionConfigId(), entity.getDistributionType());
-                                                                         if (optionalCommonDistributionConfig.isPresent()) {
-                                                                             return optionalCommonDistributionConfig.get();
-                                                                         }
-                                                                         return null;
-                                                                     })
-                                                                     .filter(commonDistributionConfig -> null != commonDistributionConfig)
-                                                                     .collect(Collectors.toList());
-
-        return configs;
+    public Collection<CommonDistributionFields> getFields() {
+        final Collection<GroupingEntity> groupingEntities = fieldAccessor.findGroupingsByDescriptorType(DescriptorType.CHANNEL.name());
+        final Collection<FieldEntityWrapper> fieldEntityWrappers = fieldAccessor.createFieldEntityWrappersFromGroupings(groupingEntities);
+        return fieldEntityWrappers.stream()
+                   .map(fieldEntityWrapper -> new CommonDistributionFields(fieldEntityWrapper))
+                   .collect(Collectors.toList());
     }
 
-    @Transactional
-    public Optional<? extends CommonDistributionConfig> getPopulatedConfig(final Long configId) {
-        if (null == configId) {
+    public Optional<CommonDistributionFields> getFields(final Long groupingId) {
+        if (null == groupingId) {
             return Optional.empty();
         }
-        final Optional<CommonDistributionConfigEntity> foundEntity = commonDistributionRepository.findById(configId);
+        final Optional<GroupingEntity> foundEntity = fieldAccessor.findGroupingById(groupingId);
         if (foundEntity.isPresent()) {
-            final CommonDistributionConfigEntity configEntity = foundEntity.get();
-            return getJobConfig(configEntity.getDistributionConfigId(), configEntity.getDistributionType());
+            final GroupingEntity groupingEntity = foundEntity.get();
+            final FieldEntityWrapper fieldEntityWrapper = fieldAccessor.createFieldEntityWrapperFromGrouping(groupingEntity);
+            return Optional.of(new CommonDistributionFields(fieldEntityWrapper));
         } else {
             return Optional.empty();
         }
-    }
-
-    private Optional<? extends CommonDistributionConfig> getJobConfig(final Long distributionConfigId, final String distributionType) {
-        final Optional<? extends CommonDistributionConfig> optionalConfig = descriptorMap.getChannelDescriptor(distributionType).getChannelDistributionRespositoryAccessor().getJobConfig(distributionConfigId);
-        return optionalConfig;
     }
 
 }

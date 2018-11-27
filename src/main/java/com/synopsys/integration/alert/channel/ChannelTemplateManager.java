@@ -60,7 +60,7 @@ public class ChannelTemplateManager {
         final String destination = event.getDestination();
         if (event instanceof DistributionEvent) {
             final DistributionEvent distributionEvent = (DistributionEvent) event;
-            final Long auditEntryId = auditUtility.createAuditEntry(distributionEvent.getAuditEntryId(), distributionEvent.getCommonDistributionConfigId(), distributionEvent.getContent());
+            final Long auditEntryId = auditUtility.createAuditEntry(distributionEvent.getAuditEntryId(), distributionEvent.getGroupingId(), distributionEvent.getContent());
             distributionEvent.setAuditEntryId(auditEntryId);
             final String jsonMessage = gson.toJson(distributionEvent);
             jmsTemplate.convertAndSend(destination, jsonMessage);

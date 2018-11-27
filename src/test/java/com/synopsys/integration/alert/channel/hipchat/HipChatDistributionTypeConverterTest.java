@@ -11,7 +11,6 @@ import com.synopsys.integration.alert.common.descriptor.config.CommonTypeConvert
 import com.synopsys.integration.alert.common.enumeration.FormatType;
 import com.synopsys.integration.alert.common.enumeration.FrequencyType;
 import com.synopsys.integration.alert.database.channel.hipchat.HipChatDistributionRepository;
-import com.synopsys.integration.alert.database.entity.CommonDistributionConfigEntity;
 import com.synopsys.integration.alert.web.model.Config;
 
 public class HipChatDistributionTypeConverterTest extends AlertIntegrationTest {

@@ -23,17 +23,16 @@ import com.synopsys.integration.alert.common.enumeration.FormatType;
 import com.synopsys.integration.alert.common.enumeration.FrequencyType;
 import com.synopsys.integration.alert.mock.NotificationTypeMockUtils;
 import com.synopsys.integration.alert.mock.ProjectMockUtils;
-import com.synopsys.integration.alert.web.model.CommonDistributionConfig;
 import com.synopsys.integration.blackduck.api.generated.enumeration.NotificationType;
 
 public class MockCommonDistributionRestModel extends MockRestModelUtil<CommonDistributionConfig> {
     protected static final ProjectMockUtils projectMock = new ProjectMockUtils();
     protected static final NotificationTypeMockUtils notificationTypeMock = new NotificationTypeMockUtils();
+    private final String providerName;
     private String id;
     private String distributionConfigId;
     private String distributionType;
     private String name;
-    private final String providerName;
     private String frequency;
     private String filterByProject;
     private String projectNamePattern;
@@ -147,12 +146,16 @@ public class MockCommonDistributionRestModel extends MockRestModelUtil<CommonDis
         return status;
     }
 
+    public void setStatus(final String status) {
+        this.status = status;
+    }
+
     public String getFormatType() {
         return formatType;
     }
 
-    public void setStatus(final String status) {
-        this.status = status;
+    public void setFormatType(final String formatType) {
+        this.formatType = formatType;
     }
 
     public void setConfiguredProjects(final List<String> configuredProjects) {
@@ -161,10 +164,6 @@ public class MockCommonDistributionRestModel extends MockRestModelUtil<CommonDis
 
     public void setNotificationTypes(final List<NotificationType> notificationTypes) {
         this.notificationTypes = notificationTypes;
-    }
-
-    public void setFormatType(final String formatType) {
-        this.formatType = formatType;
     }
 
     @Override

@@ -84,7 +84,7 @@ public class EmailChannelDescriptorTestIT extends DescriptorTestConfigTest<Email
 
         final EmailChannelEvent channelEvent = channelEventProducer.createChannelEvent(jobConfig, content);
 
-        assertEquals(Long.valueOf(1L), channelEvent.getCommonDistributionConfigId());
+        assertEquals(Long.valueOf(1L), channelEvent.getGroupingId());
         assertEquals(36, channelEvent.getEventId().length());
         assertEquals(getDescriptor().getDestinationName(), channelEvent.getDestination());
         assertEquals(subjectLine, channelEvent.getSubjectLine());

@@ -49,7 +49,6 @@ import com.synopsys.integration.alert.database.provider.blackduck.relation.UserP
 import com.synopsys.integration.alert.database.provider.blackduck.relation.UserProjectRelationRepositoryAccessor;
 import com.synopsys.integration.alert.provider.blackduck.BlackDuckProvider;
 import com.synopsys.integration.alert.web.exception.AlertFieldException;
-import com.synopsys.integration.alert.web.model.CommonDistributionConfig;
 import com.synopsys.integration.rest.RestConstants;
 
 @Component

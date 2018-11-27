@@ -21,7 +21,6 @@ import com.synopsys.integration.alert.database.provider.blackduck.BlackDuckUserR
 import com.synopsys.integration.alert.database.provider.blackduck.relation.UserProjectRelation;
 import com.synopsys.integration.alert.database.provider.blackduck.relation.UserProjectRelationRepositoryAccessor;
 import com.synopsys.integration.alert.web.controller.ControllerTest;
-import com.synopsys.integration.alert.web.model.CommonDistributionConfig;
 
 public class EmailChannelDistributionControllerTestIT extends ControllerTest {
     @Autowired

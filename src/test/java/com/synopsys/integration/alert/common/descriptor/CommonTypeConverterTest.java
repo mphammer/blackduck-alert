@@ -11,10 +11,8 @@ import com.synopsys.integration.alert.common.ContentConverter;
 import com.synopsys.integration.alert.common.descriptor.config.CommonTypeConverter;
 import com.synopsys.integration.alert.common.enumeration.FormatType;
 import com.synopsys.integration.alert.common.enumeration.FrequencyType;
-import com.synopsys.integration.alert.database.entity.CommonDistributionConfigEntity;
 import com.synopsys.integration.alert.web.actions.ConfiguredProjectsActions;
 import com.synopsys.integration.alert.web.actions.NotificationTypesActions;
-import com.synopsys.integration.alert.web.model.CommonDistributionConfig;
 
 public class CommonTypeConverterTest {
 

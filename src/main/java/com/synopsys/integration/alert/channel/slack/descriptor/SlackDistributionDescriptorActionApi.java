@@ -29,43 +29,33 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.synopsys.integration.alert.channel.event.DistributionEvent;
 import com.synopsys.integration.alert.channel.slack.SlackChannel;
-import com.synopsys.integration.alert.channel.slack.SlackChannelEvent;
-import com.synopsys.integration.alert.channel.slack.SlackEventProducer;
 import com.synopsys.integration.alert.common.descriptor.config.DescriptorActionApi;
-import com.synopsys.integration.alert.database.channel.slack.SlackDistributionRepositoryAccessor;
-import com.synopsys.integration.alert.web.model.CommonDistributionConfig;
-import com.synopsys.integration.alert.web.model.Config;
-import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.alert.common.field.CommonDistributionFields;
 
 @Component
 public class SlackDistributionDescriptorActionApi extends DescriptorActionApi {
-    private final SlackChannel slackChannel;
-    private final SlackEventProducer slackEventProducer;
 
     @Autowired
-    public SlackDistributionDescriptorActionApi(final SlackDistributionTypeConverter databaseContentConverter, final SlackDistributionRepositoryAccessor repositoryAccessor,
-        final SlackChannel slackChannel, final SlackEventProducer slackEventProducer) {
-        super(databaseContentConverter, repositoryAccessor);
-        this.slackEventProducer = slackEventProducer;
-        this.slackChannel = slackChannel;
+    public SlackDistributionDescriptorActionApi(final SlackChannel slackChannel) {
+        super(slackChannel);
     }
 
     @Override
-    public void validateConfig(final Config restModel, final Map<String, String> fieldErrors) {
-        final SlackDistributionConfig slackRestModel = (SlackDistributionConfig) restModel;
-        if (StringUtils.isBlank(slackRestModel.getWebhook())) {
+    public void validateConfig(final CommonDistributionFields commonDistributionFields, final Map<String, String> fieldErrors) {
+        final String webhook = commonDistributionFields.getStringValue(SlackChannel.KEY_WEBHOOK);
+        final String channelName = commonDistributionFields.getStringValue(SlackChannel.KEY_CHANNEL_NAME);
+        if (StringUtils.isBlank(webhook)) {
             fieldErrors.put("webhook", "A webhook is required.");
         }
-        if (StringUtils.isBlank(slackRestModel.getChannelName())) {
+        if (StringUtils.isBlank(channelName)) {
             fieldErrors.put("channelName", "A channel name is required.");
         }
     }
 
     @Override
-    public void testConfig(final Config restModel) throws IntegrationException {
-        final SlackChannelEvent event = slackEventProducer.createChannelTestEvent((CommonDistributionConfig) restModel);
-        slackChannel.sendMessage(event);
+    public DistributionEvent createTestEvent(final CommonDistributionFields commonDistributionFields) {
+        return null;
     }
-
 }

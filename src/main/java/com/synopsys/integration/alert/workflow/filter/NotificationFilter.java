@@ -39,11 +39,11 @@ import org.springframework.stereotype.Component;
 
 import com.synopsys.integration.alert.common.descriptor.ProviderDescriptor;
 import com.synopsys.integration.alert.common.enumeration.FrequencyType;
+import com.synopsys.integration.alert.common.field.CommonDistributionFields;
 import com.synopsys.integration.alert.common.field.JsonField;
 import com.synopsys.integration.alert.common.provider.ProviderContentType;
 import com.synopsys.integration.alert.database.channel.JobConfigReader;
 import com.synopsys.integration.alert.database.entity.NotificationContent;
-import com.synopsys.integration.alert.web.model.CommonDistributionConfig;
 import com.synopsys.integration.alert.workflow.filter.builder.AndFieldFilterBuilder;
 import com.synopsys.integration.alert.workflow.filter.builder.DefaultFilterBuilders;
 import com.synopsys.integration.alert.workflow.filter.builder.JsonFieldFilterBuilder;
@@ -69,15 +69,15 @@ public class NotificationFilter {
      * @return A java.util.List of sorted (by createdAt) NotificationContent objects.
      */
     public Collection<NotificationContent> extractApplicableNotifications(final FrequencyType frequency, final Collection<NotificationContent> notificationList) {
-        final List<? extends CommonDistributionConfig> unfilteredDistributionConfigs = jobConfigReader.getPopulatedConfigs();
+        final Collection<CommonDistributionFields> unfilteredDistributionConfigs = jobConfigReader.getFields();
         if (unfilteredDistributionConfigs.isEmpty()) {
             return Collections.emptyList();
         }
 
-        final List<? extends CommonDistributionConfig> distributionConfigs = unfilteredDistributionConfigs
-                                                                                 .parallelStream()
-                                                                                 .filter(config -> frequency.name().equals(config.getFrequency()))
-                                                                                 .collect(Collectors.toList());
+        final List<CommonDistributionFields> distributionConfigs = unfilteredDistributionConfigs
+                                                                       .parallelStream()
+                                                                       .filter(config -> frequency.name().equals(config.getDigestType()))
+                                                                       .collect(Collectors.toList());
 
         if (distributionConfigs.isEmpty()) {
             return Collections.emptyList();
@@ -109,15 +109,15 @@ public class NotificationFilter {
      * Creates a java.util.Collection of NotificationContent objects that are applicable for at least one Distribution Job.
      * @return A java.util.List of sorted (by createdAt) NotificationContent objects.
      */
-    public Collection<NotificationContent> extractApplicableNotifications(final Set<ProviderContentType> providerContentTypes, final CommonDistributionConfig jobConfiguration, final Collection<NotificationContent> notificationList) {
-        final Set<String> configuredNotificationTypes = new HashSet<>(jobConfiguration.getNotificationTypes());
+    public Collection<NotificationContent> extractApplicableNotifications(final Set<ProviderContentType> providerContentTypes, final CommonDistributionFields jobConfiguration, final Collection<NotificationContent> notificationList) {
+        final Set<String> configuredNotificationTypes = new HashSet(jobConfiguration.getNotificationTypes());
         if (configuredNotificationTypes.isEmpty()) {
             return Collections.emptyList();
         }
 
         final Map<String, List<NotificationContent>> notificationsByType = getNotificationsByType(configuredNotificationTypes, notificationList);
 
-        final Set<NotificationContent> filteredNotifications = new HashSet<>();
+        final Set<NotificationContent> filteredNotifications = new HashSet();
         notificationsByType.forEach((type, groupedNotifications) -> {
             final Set<JsonField> filterableFields = getFilterableFieldsByNotificationType(type, providerContentTypes);
             final Predicate<NotificationContent> filterForNotificationType = createJobFilter(filterableFields, jobConfiguration);
@@ -131,7 +131,7 @@ public class NotificationFilter {
                    .collect(Collectors.toList());
     }
 
-    private Set<String> getConfiguredNotificationTypes(final List<? extends CommonDistributionConfig> distributionConfigs) {
+    private Set<String> getConfiguredNotificationTypes(final List<CommonDistributionFields> distributionConfigs) {
         return distributionConfigs
                    .parallelStream()
                    .flatMap(config -> config.getNotificationTypes().stream())

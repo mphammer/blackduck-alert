@@ -34,8 +34,29 @@ import com.synopsys.integration.alert.database.entity.DatabaseEntity;
 public class GroupingEntity extends DatabaseEntity {
 
     @Column(name = "descriptor_type")
-    private String descriptorType;
+    private final String descriptorType;
+
+    @Column(name = "descriptor_name")
+    private final String descriptorName;
 
     @Column(name = "display_type")
-    private String displayType;
+    private final String displayType;
+
+    public GroupingEntity(final String descriptorType, final String descriptorName, final String displayType) {
+        this.descriptorType = descriptorType;
+        this.descriptorName = descriptorName;
+        this.displayType = displayType;
+    }
+
+    public String getDescriptorType() {
+        return descriptorType;
+    }
+
+    public String getDescriptorName() {
+        return descriptorName;
+    }
+
+    public String getDisplayType() {
+        return displayType;
+    }
 }

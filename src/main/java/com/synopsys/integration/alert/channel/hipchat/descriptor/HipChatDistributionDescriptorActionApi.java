@@ -29,41 +29,31 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.synopsys.integration.alert.channel.event.DistributionEvent;
 import com.synopsys.integration.alert.channel.hipchat.HipChatChannel;
-import com.synopsys.integration.alert.channel.hipchat.HipChatChannelEvent;
-import com.synopsys.integration.alert.channel.hipchat.HipChatEventProducer;
 import com.synopsys.integration.alert.common.descriptor.config.DescriptorActionApi;
-import com.synopsys.integration.alert.web.model.CommonDistributionConfig;
-import com.synopsys.integration.alert.web.model.Config;
-import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.alert.common.field.CommonDistributionFields;
 
 @Component
 public class HipChatDistributionDescriptorActionApi extends DescriptorActionApi {
-    private final HipChatChannel hipChatChannel;
-    private final HipChatEventProducer hipChatEventProducer;
 
     @Autowired
-    public HipChatDistributionDescriptorActionApi(final HipChatDistributionTypeConverter databaseContentConverter, final HipChatDistributionRepositoryAccessor repositoryAccessor,
-        final HipChatChannel hipChatChannel, final HipChatEventProducer hipChatEventProducer) {
-        super(databaseContentConverter, repositoryAccessor);
-        this.hipChatEventProducer = hipChatEventProducer;
-        this.hipChatChannel = hipChatChannel;
+    public HipChatDistributionDescriptorActionApi(final HipChatChannel hipChatChannel) {
+        super(hipChatChannel);
     }
 
     @Override
-    public void validateConfig(final Config restModel, final Map<String, String> fieldErrors) {
-        final HipChatDistributionConfig hipChatRestModel = (HipChatDistributionConfig) restModel;
-        if (StringUtils.isBlank(hipChatRestModel.getRoomId())) {
+    public void validateConfig(final CommonDistributionFields commonDistributionFields, final Map<String, String> fieldErrors) {
+        final String roomId = commonDistributionFields.getStringValue(HipChatDistributionUIConfig.KEY_ROOM_ID);
+        if (StringUtils.isBlank(roomId)) {
             fieldErrors.put("roomId", "A Room Id is required.");
-        } else if (!StringUtils.isNumeric(hipChatRestModel.getRoomId())) {
+        } else if (!StringUtils.isNumeric(roomId)) {
             fieldErrors.put("roomId", "Room Id must be an integer value");
         }
     }
 
     @Override
-    public void testConfig(final Config restModel) throws IntegrationException {
-        final HipChatChannelEvent event = hipChatEventProducer.createChannelTestEvent((CommonDistributionConfig) restModel);
-        hipChatChannel.sendMessage(event);
+    public DistributionEvent createTestEvent(final CommonDistributionFields commonDistributionFields) {
+        return null;
     }
-
 }

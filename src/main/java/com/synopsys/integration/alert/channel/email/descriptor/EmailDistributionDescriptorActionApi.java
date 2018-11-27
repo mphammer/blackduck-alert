@@ -33,7 +33,6 @@ import com.synopsys.integration.alert.channel.email.EmailEventProducer;
 import com.synopsys.integration.alert.channel.email.EmailGroupChannel;
 import com.synopsys.integration.alert.common.descriptor.config.DescriptorActionApi;
 import com.synopsys.integration.alert.database.channel.email.EmailDistributionRepositoryAccessor;
-import com.synopsys.integration.alert.web.model.CommonDistributionConfig;
 import com.synopsys.integration.alert.web.model.Config;
 import com.synopsys.integration.exception.IntegrationException;
 
@@ -56,6 +55,7 @@ public class EmailDistributionDescriptorActionApi extends DescriptorActionApi {
 
     @Override
     public void testConfig(final Config restModel) throws IntegrationException {
+        // TODO move this elsewhere and perform all the custom email stuff here
         final EmailChannelEvent event = emailEventProducer.createChannelTestEvent((CommonDistributionConfig) restModel);
         emailGroupChannel.sendMessage(event);
     }

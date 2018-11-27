@@ -33,35 +33,31 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.synopsys.integration.alert.common.descriptor.DescriptorMap;
+import com.synopsys.integration.alert.common.field.CommonDistributionFields;
 import com.synopsys.integration.alert.common.model.AggregateMessageContent;
-import com.synopsys.integration.alert.web.model.CommonDistributionConfig;
 
 @Component
 public class NotificationToChannelEventConverter {
     private final Logger logger = LoggerFactory.getLogger(NotificationToChannelEventConverter.class);
-    private final DescriptorMap descriptorMap;
+    private final ChannelEventProducer channelEventProducer;
 
     @Autowired
-    public NotificationToChannelEventConverter(final DescriptorMap descriptorMap) {
-        this.descriptorMap = descriptorMap;
+    public NotificationToChannelEventConverter(final ChannelEventProducer channelEventProducer) {
+        this.channelEventProducer = channelEventProducer;
     }
 
-    public List<DistributionEvent> convertToEvents(final Map<? extends CommonDistributionConfig, List<AggregateMessageContent>> messageContentMap) {
+    public List<DistributionEvent> convertToEvents(final Map<CommonDistributionFields, List<AggregateMessageContent>> messageContentMap) {
         final List<DistributionEvent> distributionEvents = new ArrayList<>();
-        final Set<? extends Map.Entry<? extends CommonDistributionConfig, List<AggregateMessageContent>>> jobMessageContentEntries = messageContentMap.entrySet();
-        for (final Map.Entry<? extends CommonDistributionConfig, List<AggregateMessageContent>> entry : jobMessageContentEntries) {
-            final CommonDistributionConfig jobConfig = entry.getKey();
+        final Set<? extends Map.Entry<CommonDistributionFields, List<AggregateMessageContent>>> jobMessageContentEntries = messageContentMap.entrySet();
+        for (final Map.Entry<CommonDistributionFields, List<AggregateMessageContent>> entry : jobMessageContentEntries) {
+            final CommonDistributionFields jobConfig = entry.getKey();
             final List<AggregateMessageContent> contentList = entry.getValue();
             for (final AggregateMessageContent content : contentList) {
-                distributionEvents.add(createChannelEvent(jobConfig, content));
+                distributionEvents.add(channelEventProducer.createChannelEvent(jobConfig, content));
             }
         }
         logger.debug("Created {} events.", distributionEvents.size());
         return distributionEvents;
     }
 
-    private DistributionEvent createChannelEvent(final CommonDistributionConfig config, final AggregateMessageContent messageContent) {
-        return descriptorMap.getChannelDescriptor(config.getDistributionType()).getChannelEventProducer().createChannelEvent(config, messageContent);
-    }
 }

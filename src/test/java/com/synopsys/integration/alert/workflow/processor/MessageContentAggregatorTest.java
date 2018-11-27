@@ -25,7 +25,6 @@ import com.synopsys.integration.alert.common.model.AggregateMessageContent;
 import com.synopsys.integration.alert.database.channel.JobConfigReader;
 import com.synopsys.integration.alert.database.entity.NotificationContent;
 import com.synopsys.integration.alert.provider.blackduck.BlackDuckProvider;
-import com.synopsys.integration.alert.web.model.CommonDistributionConfig;
 import com.synopsys.integration.alert.workflow.filter.NotificationFilter;
 import com.synopsys.integration.blackduck.api.generated.enumeration.NotificationType;
 
@@ -70,7 +69,7 @@ public class MessageContentAggregatorTest extends AlertIntegrationTest {
         final EmailDistributionConfig jobConfig = createEmailDistributionJob("channel_email", BlackDuckProvider.COMPONENT_NAME, frequencyType.name(), projectList, notificationTypesLIst, FormatType.DEFAULT);
 
         final JobConfigReader spiedReader = Mockito.spy(jobConfigReader);
-        Mockito.doReturn(Arrays.asList(jobConfig)).when(spiedReader).getPopulatedConfigs();
+        Mockito.doReturn(Arrays.asList(jobConfig)).when(spiedReader).getFields();
 
         final MessageContentAggregator messageContentAggregator = new MessageContentAggregator(spiedReader, providerDescriptors, notificationFilter);
         final Map<? extends CommonDistributionConfig, List<AggregateMessageContent>> topicContentMap = messageContentAggregator.processNotifications(frequencyType, notificationContentList);
@@ -97,7 +96,7 @@ public class MessageContentAggregatorTest extends AlertIntegrationTest {
         final EmailDistributionConfig jobConfig = createEmailDistributionJob("channel_email", BlackDuckProvider.COMPONENT_NAME, FrequencyType.DAILY.name(), projectList, notificationTypesLIst, FormatType.DEFAULT);
 
         final JobConfigReader spiedReader = Mockito.spy(jobConfigReader);
-        Mockito.doReturn(Arrays.asList(jobConfig)).when(spiedReader).getPopulatedConfigs();
+        Mockito.doReturn(Arrays.asList(jobConfig)).when(spiedReader).getFields();
 
         final MessageContentAggregator messageContentAggregator = new MessageContentAggregator(spiedReader, providerDescriptors, notificationFilter);
         final Map<? extends CommonDistributionConfig, List<AggregateMessageContent>> topicContentMap = messageContentAggregator.processNotifications(frequencyType, notificationContentList);
@@ -122,7 +121,7 @@ public class MessageContentAggregatorTest extends AlertIntegrationTest {
         final EmailDistributionConfig jobConfig = createEmailDistributionJob("channel_email", unknownProvider, frequencyType.name(), projectList, notificationTypesLIst, FormatType.DEFAULT);
 
         final JobConfigReader spiedReader = Mockito.spy(jobConfigReader);
-        Mockito.doReturn(Arrays.asList(jobConfig)).when(spiedReader).getPopulatedConfigs();
+        Mockito.doReturn(Arrays.asList(jobConfig)).when(spiedReader).getFields();
 
         final MessageContentAggregator messageContentAggregator = new MessageContentAggregator(spiedReader, providerDescriptors, notificationFilter);
         final Map<? extends CommonDistributionConfig, List<AggregateMessageContent>> topicContentMap = messageContentAggregator.processNotifications(frequencyType, notificationContentList);
@@ -148,7 +147,7 @@ public class MessageContentAggregatorTest extends AlertIntegrationTest {
         final EmailDistributionConfig jobConfig = createEmailDistributionJob("channel_email", BlackDuckProvider.COMPONENT_NAME, frequencyType.name(), projectList, notificationTypesLIst, FormatType.DEFAULT);
 
         final JobConfigReader spiedReader = Mockito.spy(jobConfigReader);
-        Mockito.doReturn(Arrays.asList(jobConfig)).when(spiedReader).getPopulatedConfigs();
+        Mockito.doReturn(Arrays.asList(jobConfig)).when(spiedReader).getFields();
 
         final MessageContentAggregator messageContentAggregator = new MessageContentAggregator(spiedReader, providerDescriptors, notificationFilter);
         final Map<? extends CommonDistributionConfig, List<AggregateMessageContent>> topicContentMap = messageContentAggregator.processNotifications(frequencyType, notificationContentList);
