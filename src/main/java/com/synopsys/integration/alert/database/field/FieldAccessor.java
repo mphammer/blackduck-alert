@@ -79,14 +79,15 @@ public class FieldAccessor {
         groupingEntityRepository.deleteById(groupingId);
     }
 
-    public FieldEntityWrapper createFieldEntityWrapperFromGrouping(final GroupingEntity groupingEntity) {
+    public FieldGroupingWrapper createFieldEntityWrapperFromGrouping(final GroupingEntity groupingEntity) {
         final Collection<FieldValuesEntity> fieldValuesEntities = findFieldsOfGrouping(groupingEntity.getId());
-        return new FieldEntityWrapper(groupingEntity, fieldValuesEntities);
+        return new FieldGroupingWrapper(groupingEntity, fieldValuesEntities);
     }
 
-    public Collection<FieldEntityWrapper> createFieldEntityWrappersFromGroupings(final Collection<GroupingEntity> groupingEntities) {
+    public Collection<FieldGroupingWrapper> createFieldEntityWrappersFromGroupings(final Collection<GroupingEntity> groupingEntities) {
         return groupingEntities.stream()
                    .map(groupingEntity -> createFieldEntityWrapperFromGrouping(groupingEntity))
                    .collect(Collectors.toList());
     }
+
 }

@@ -32,10 +32,11 @@ import com.synopsys.integration.alert.database.entity.DatabaseEntity;
 @Entity
 @Table(schema = "alert", name = "field_values")
 public class FieldValuesEntity extends DatabaseEntity {
+    public static final String COLUMN_NAME_VALUE = "value";
 
     @Column(name = "key")
     private final String key;
-    @Column(name = "value")
+    @Column(name = COLUMN_NAME_VALUE)
     private final String value;
     @Column(name = "secure")
     private final Boolean secure;

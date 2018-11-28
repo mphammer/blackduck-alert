@@ -31,7 +31,7 @@ import com.synopsys.integration.alert.channel.event.DistributionEvent;
 import com.synopsys.integration.alert.common.AlertProperties;
 import com.synopsys.integration.alert.common.exception.AlertException;
 import com.synopsys.integration.alert.database.audit.AuditUtility;
-import com.synopsys.integration.alert.database.field.FieldEntityWrapper;
+import com.synopsys.integration.alert.database.field.FieldGroupingWrapper;
 import com.synopsys.integration.alert.provider.blackduck.BlackDuckProperties;
 import com.synopsys.integration.alert.workflow.MessageReceiver;
 import com.synopsys.integration.exception.IntegrationException;
@@ -92,8 +92,8 @@ public abstract class DistributionChannel extends MessageReceiver {
     public abstract void sendMessage(final DistributionEvent event) throws IntegrationException;
 
     // TODO should we do testing in the channel or not????
-    public String testGlobalConfig(final FieldEntityWrapper fieldEntityWrapper) throws IntegrationException {
-        if (fieldEntityWrapper != null) {
+    public String testGlobalConfig(final FieldGroupingWrapper fieldGroupingWrapper) throws IntegrationException {
+        if (fieldGroupingWrapper != null) {
             throw new AlertException("Test method not implemented.");
         }
         return "The provided config was null.";

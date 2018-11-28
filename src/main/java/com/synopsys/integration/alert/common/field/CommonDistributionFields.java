@@ -1,30 +1,28 @@
 package com.synopsys.integration.alert.common.field;
 
+import java.util.List;
+
 import org.apache.commons.lang3.EnumUtils;
 
 import com.synopsys.integration.alert.common.enumeration.FormatType;
 import com.synopsys.integration.alert.common.enumeration.FrequencyType;
-import com.synopsys.integration.alert.database.field.FieldEntityWrapper;
+import com.synopsys.integration.alert.database.field.FieldGroupingWrapper;
 
-public class CommonDistributionFields {
-    public static String KEY_NAME = "channel.name";
-    public static String KEY_PROVIDER_NAME = "channel.provider.name";
-    public static String KEY_DIGEST_TYPE = "channel.digest.type";
-    public static String KEY_PROJECT_NAME_PATTERN = "channel.project.name.pattern";
-    public static String KEY_FORMAT_TYPE = "channel.format.type";
+public class CommonDistributionFields extends BasicFields {
+    public static String KEY_NAME = "distribution.channel.name";
+    public static String KEY_PROVIDER_NAME = "distribution.channel.provider.name";
+    public static String KEY_DIGEST_TYPE = "distribution.channel.digest.type";
+    public static String KEY_PROJECT_NAME_PATTERN = "distribution.channel.project.name.pattern";
+    public static String KEY_FORMAT_TYPE = "distribution.channel.format.type";
+    public static String KEY_CONFIGURED_PROJECTS = "distribution.channel.configured.projects";
+    public static String KEY_NOTIFICATION_TYPES = "distribution.channel.notification.types";
 
-    private final FieldEntityWrapper fieldEntityWrapper;
-
-    public CommonDistributionFields(final FieldEntityWrapper fieldEntityWrapper) {
-        this.fieldEntityWrapper = fieldEntityWrapper;
-    }
-
-    public FieldEntityWrapper getFieldEntityWrapper() {
-        return fieldEntityWrapper;
+    public CommonDistributionFields(final FieldGroupingWrapper fieldGroupingWrapper) {
+        super(fieldGroupingWrapper);
     }
 
     public Long getGroupingId() {
-        return fieldEntityWrapper.getGroupingId();
+        return getFieldGroupingWrapper().getGroupingId();
     }
 
     public String getName() {
@@ -32,7 +30,7 @@ public class CommonDistributionFields {
     }
 
     public String getDistributionType() {
-        return fieldEntityWrapper.getDescriptorName();
+        return getFieldGroupingWrapper().getDescriptorName();
     }
 
     public String getProviderName() {
@@ -53,7 +51,10 @@ public class CommonDistributionFields {
         return EnumUtils.getEnum(FormatType.class, formatType);
     }
 
-    public String getStringValue(String key) {
-        return fieldEntityWrapper.getStringValue(key);
+    public List<String> getNotificationTypes() {
+
     }
+
+    public List<String> getConfiguredProjects() {}
+
 }

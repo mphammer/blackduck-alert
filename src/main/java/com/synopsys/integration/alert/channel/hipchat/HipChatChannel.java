@@ -52,7 +52,7 @@ import com.synopsys.integration.alert.common.exception.AlertException;
 import com.synopsys.integration.alert.common.field.CommonDistributionFields;
 import com.synopsys.integration.alert.common.model.AggregateMessageContent;
 import com.synopsys.integration.alert.database.audit.AuditUtility;
-import com.synopsys.integration.alert.database.field.FieldEntityWrapper;
+import com.synopsys.integration.alert.database.field.FieldGroupingWrapper;
 import com.synopsys.integration.alert.provider.blackduck.BlackDuckProperties;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.connection.RestConnection;
@@ -86,20 +86,20 @@ public class HipChatChannel extends RestDistributionChannel {
     }
 
     @Override
-    public String testGlobalConfig(final FieldEntityWrapper fieldEntityWrapper) throws IntegrationException {
-        if (fieldEntityWrapper == null) {
+    public String testGlobalConfig(final FieldGroupingWrapper fieldGroupingWrapper) throws IntegrationException {
+        if (fieldGroupingWrapper == null) {
             throw new AlertException("The provided config was null.");
         }
 
-        final String hostServer = fieldEntityWrapper.getStringValue(HipChatGlobalUIConfig.KEY_HOST_SERVER);
+        final String hostServer = fieldGroupingWrapper.getFieldValue(HipChatGlobalUIConfig.KEY_HOST_SERVER);
         final String configuredApiUrl = getConfiguredApiUrl(hostServer);
 
-        final String apiKey = fieldEntityWrapper.getStringValue(HipChatGlobalUIConfig.KEY_API_KEY);
+        final String apiKey = fieldGroupingWrapper.getFieldValue(HipChatGlobalUIConfig.KEY_API_KEY);
         try (final RestConnection restConnection = getChannelRestConnectionFactory().createUnauthenticatedRestConnection(configuredApiUrl)) {
             final String testResult = testApiKeyAndApiUrlConnection(restConnection, configuredApiUrl, apiKey);
-            final String roomId = fieldEntityWrapper.getStringValue(HipChatDistributionUIConfig.KEY_ROOM_ID);
-            final Boolean notify = Boolean.parseBoolean(fieldEntityWrapper.getStringValue(HipChatDistributionUIConfig.KEY_NOTIFY));
-            final String color = fieldEntityWrapper.getStringValue(HipChatDistributionUIConfig.KEY_COLOR);
+            final String roomId = fieldGroupingWrapper.getFieldValue(HipChatDistributionUIConfig.KEY_ROOM_ID);
+            final Boolean notify = Boolean.parseBoolean(fieldGroupingWrapper.getFieldValue(HipChatDistributionUIConfig.KEY_NOTIFY));
+            final String color = fieldGroupingWrapper.getFieldValue(HipChatDistributionUIConfig.KEY_COLOR);
 
             final String htmlMessage = "This is a test message sent by Alert.";
             final Request testRequest = createRequest(hostServer, apiKey, roomId, notify, color, htmlMessage);

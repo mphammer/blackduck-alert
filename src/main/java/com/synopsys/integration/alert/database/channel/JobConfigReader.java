@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
 import com.synopsys.integration.alert.common.enumeration.DescriptorType;
 import com.synopsys.integration.alert.common.field.CommonDistributionFields;
 import com.synopsys.integration.alert.database.field.FieldAccessor;
-import com.synopsys.integration.alert.database.field.FieldEntityWrapper;
+import com.synopsys.integration.alert.database.field.FieldGroupingWrapper;
 import com.synopsys.integration.alert.database.field.GroupingEntity;
 
 @Component
@@ -47,8 +47,8 @@ public class JobConfigReader {
 
     public Collection<CommonDistributionFields> getFields() {
         final Collection<GroupingEntity> groupingEntities = fieldAccessor.findGroupingsByDescriptorType(DescriptorType.CHANNEL.name());
-        final Collection<FieldEntityWrapper> fieldEntityWrappers = fieldAccessor.createFieldEntityWrappersFromGroupings(groupingEntities);
-        return fieldEntityWrappers.stream()
+        final Collection<FieldGroupingWrapper> fieldGroupingWrappers = fieldAccessor.createFieldEntityWrappersFromGroupings(groupingEntities);
+        return fieldGroupingWrappers.stream()
                    .map(fieldEntityWrapper -> new CommonDistributionFields(fieldEntityWrapper))
                    .collect(Collectors.toList());
     }
@@ -60,8 +60,8 @@ public class JobConfigReader {
         final Optional<GroupingEntity> foundEntity = fieldAccessor.findGroupingById(groupingId);
         if (foundEntity.isPresent()) {
             final GroupingEntity groupingEntity = foundEntity.get();
-            final FieldEntityWrapper fieldEntityWrapper = fieldAccessor.createFieldEntityWrapperFromGrouping(groupingEntity);
-            return Optional.of(new CommonDistributionFields(fieldEntityWrapper));
+            final FieldGroupingWrapper fieldGroupingWrapper = fieldAccessor.createFieldEntityWrapperFromGrouping(groupingEntity);
+            return Optional.of(new CommonDistributionFields(fieldGroupingWrapper));
         } else {
             return Optional.empty();
         }
