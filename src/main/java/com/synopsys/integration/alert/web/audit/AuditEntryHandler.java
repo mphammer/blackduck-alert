@@ -23,6 +23,8 @@
  */
 package com.synopsys.integration.alert.web.audit;
 
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -57,10 +59,10 @@ public class AuditEntryHandler extends ControllerHandler {
     }
 
     public ResponseEntity<String> resendNotification(final Long notificationdId, final Long commonConfigId) {
-        AlertPagedModel<AuditEntryModel> auditEntries = null;
+        Set<String> matchingDistributionJobs = null;
         try {
-            auditEntries = auditEntryActions.resendNotification(notificationdId, commonConfigId);
-            return createResponse(HttpStatus.OK, notificationdId, gson.toJson(auditEntries));
+            matchingDistributionJobs = auditEntryActions.resendNotification(notificationdId, commonConfigId);
+            return createResponse(HttpStatus.OK, notificationdId, gson.toJson(matchingDistributionJobs));
         } catch (final AlertNotificationPurgedException e) {
             return createResponse(HttpStatus.GONE, notificationdId, e.getMessage());
         } catch (final AlertJobMissingException e) {

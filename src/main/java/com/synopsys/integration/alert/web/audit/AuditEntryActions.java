@@ -28,9 +28,11 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -47,6 +49,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.synopsys.integration.alert.channel.ChannelTemplateManager;
 import com.synopsys.integration.alert.channel.event.DistributionEvent;
 import com.synopsys.integration.alert.common.enumeration.AuditEntryStatus;
+import com.synopsys.integration.alert.common.exception.AlertException;
 import com.synopsys.integration.alert.database.audit.AuditEntryEntity;
 import com.synopsys.integration.alert.database.audit.AuditEntryRepository;
 import com.synopsys.integration.alert.database.audit.AuditNotificationRepository;
@@ -110,13 +113,14 @@ public class AuditEntryActions {
         return null;
     }
 
-    public AlertPagedModel<AuditEntryModel> resendNotification(final Long notificationdId, final Long commonConfigId) throws IntegrationException {
+    public Set<String> resendNotification(final Long notificationdId, final Long commonConfigId) throws IntegrationException {
         final Optional<NotificationContent> notificationContentOptional = notificationManager.findById(notificationdId);
         if (!notificationContentOptional.isPresent()) {
             throw new AlertNotificationPurgedException("No notification with this id exists.");
         }
         final NotificationContent notificationContent = notificationContentOptional.get();
-        List<DistributionEvent> distributionEvents = null;
+        final Set<String> matchingDistributionJobs = new HashSet<>();
+        final List<DistributionEvent> distributionEvents;
         if (null != commonConfigId) {
             final Optional<? extends CommonDistributionConfig> commonDistributionConfig = jobConfigReader.getPopulatedConfig(commonConfigId);
             if (!commonDistributionConfig.isPresent()) {
@@ -124,15 +128,23 @@ public class AuditEntryActions {
                 throw new AlertJobMissingException("The Distribution Job with this id could not be found.");
             } else {
                 distributionEvents = notificationProcessor.processNotifications(commonDistributionConfig.get(), Arrays.asList(notificationContent));
+                if (distributionEvents.isEmpty()) {
+                    throw new AlertException("This notification could not be sent. This Distribution Job configured does not match the notification.");
+                } else {
+                    matchingDistributionJobs.add(commonDistributionConfig.get().getName());
+                }
             }
         } else {
             distributionEvents = notificationProcessor.processNotifications(Arrays.asList(notificationContent));
-        }
-        if (distributionEvents.isEmpty()) {
-            logger.warn("This notification could not be sent. Make sure you have a Distribution Job configured to handle this notification.");
+            if (distributionEvents.isEmpty()) {
+                logger.warn("This notification could not be sent. Make sure you have a Distribution Job configured to handle this notification.");
+            }
         }
         distributionEvents.forEach(event -> {
             final Long commonDistributionId = event.getCommonDistributionConfigId();
+            final Optional<? extends CommonDistributionConfig> commonDistributionConfig = jobConfigReader.getPopulatedConfig(commonDistributionId);
+            matchingDistributionJobs.add(commonDistributionConfig.get().getName());
+
             Long auditId = null;
             final Optional<AuditEntryEntity> auditEntryEntity = auditEntryRepository.findMatchingAudit(notificationContent.getId(), commonDistributionId);
             final Map<Long, Long> notificationIdToAuditId = new HashMap<>();
@@ -143,7 +155,7 @@ public class AuditEntryActions {
             event.setNotificationIdToAuditId(notificationIdToAuditId);
             channelTemplateManager.sendEvent(event);
         });
-        return get();
+        return matchingDistributionJobs;
     }
 
     private Page<NotificationContent> queryForNotifications(final String sortField, final String sortOrder, final String searchTerm, final Integer pageNumber, final Integer pageSize, final boolean onlyShowSentNotifications) {

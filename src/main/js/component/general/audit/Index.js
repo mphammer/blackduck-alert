@@ -111,10 +111,11 @@ class Index extends Component {
                 }
             }
             return response.json().then((json) => {
-                setTimeout(function () {
-                    this.setState({message: ''});
-                }.bind(this), 3000);
-                this.setEntriesFromArray(JSON.parse(json.message));
+                this.reloadAuditEntries();
+                console.error(json.message);
+                let jsonArray = JSON.parse(json.message);
+                let newMessage = "";
+                this.setState({message: newMessage});
             });
         }).catch(console.error);
     }
@@ -208,7 +209,7 @@ class Index extends Component {
     }
 
     refreshAuditEntries() {
-        this.reloadAuditEntries(this.state.currentPage, this.state.currentPageSize, this.state.searchTerm, this.state.sortField, this.state.sortOrder, this.state.onlyShowSentNotifications);
+        this.reloadAuditEntries();
     }
 
 
