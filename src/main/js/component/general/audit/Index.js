@@ -102,6 +102,7 @@ class Index extends Component {
             });
             if (!response.ok) {
                 switch (response.status) {
+                    // TODO handle error messages better, the message disappears almost instantly
                     case 401:
                     case 403:
                         this.props.logout();
@@ -113,9 +114,18 @@ class Index extends Component {
             return response.json().then((json) => {
                 this.reloadAuditEntries();
                 console.error(json.message);
+                let projects = "";
                 let jsonArray = JSON.parse(json.message);
-                let newMessage = "";
-                this.setState({message: newMessage});
+                jsonArray.forEach((entry) => {
+                    if (projects && projects.trim().length > 0) {
+                        projects = projects + ', ' + entry;
+                    } else {
+                        projects = entry;
+                    }
+                });
+                let matchedProjectMessage = "This notification matched these jobs: " + projects;
+                alert(matchedProjectMessage);
+                // TODO handle the display of the projects better
             });
         }).catch(console.error);
     }
