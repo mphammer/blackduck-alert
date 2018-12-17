@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,12 +42,12 @@ import com.synopsys.integration.alert.common.descriptor.ChannelDescriptor;
 import com.synopsys.integration.alert.common.descriptor.Descriptor;
 import com.synopsys.integration.alert.common.descriptor.DescriptorMap;
 import com.synopsys.integration.alert.common.descriptor.ProviderDescriptor;
-import com.synopsys.integration.alert.common.descriptor.config.UIComponent;
-import com.synopsys.integration.alert.common.descriptor.config.UIConfig;
 import com.synopsys.integration.alert.common.descriptor.config.field.ConfigField;
 import com.synopsys.integration.alert.common.descriptor.config.field.SelectConfigField;
 import com.synopsys.integration.alert.common.descriptor.config.field.TextInputConfigField;
-import com.synopsys.integration.alert.common.enumeration.ActionApiType;
+import com.synopsys.integration.alert.common.descriptor.config.ui.UIComponent;
+import com.synopsys.integration.alert.common.descriptor.config.ui.UIConfig;
+import com.synopsys.integration.alert.common.enumeration.ConfigContextEnum;
 import com.synopsys.integration.alert.common.enumeration.FrequencyType;
 
 @RestController
@@ -68,7 +69,7 @@ public class UIComponentController extends BaseController {
             if (descriptor != null) {
                 // filter by type also
                 if (StringUtils.isNotBlank(descriptorConfigType)) {
-                    final ActionApiType descriptorType = ActionApiType.getRestApiType(descriptorConfigType);
+                    final ConfigContextEnum descriptorType = EnumUtils.getEnum(ConfigContextEnum.class, descriptorConfigType);
                     final UIConfig uiConfig = descriptor.getUIConfig(descriptorType);
                     if (uiConfig != null) {
                         return Arrays.asList(uiConfig.generateUIComponent());
@@ -83,13 +84,14 @@ public class UIComponentController extends BaseController {
                 return Collections.emptyList();
             }
         } else if (StringUtils.isNotBlank(descriptorConfigType)) {
-            final ActionApiType descriptorConfigTypeEnum = ActionApiType.getRestApiType(descriptorConfigType);
+            final ConfigContextEnum descriptorConfigTypeEnum = EnumUtils.getEnum(ConfigContextEnum.class, descriptorConfigType);
             return descriptorMap.getUIComponents(descriptorConfigTypeEnum);
         } else {
             return descriptorMap.getAllUIComponents();
         }
     }
 
+    // TODO split out provider and distribution endpoints
     @GetMapping("/distribution")
     public UIComponent getDistributionUIComponent(@RequestParam(value = "providerName", required = true) final String providerName, @RequestParam(value = "channelName", required = true) final String channelName) {
         if (StringUtils.isBlank(providerName) || StringUtils.isBlank(channelName)) {
@@ -97,8 +99,8 @@ public class UIComponentController extends BaseController {
         } else {
             final ProviderDescriptor providerDescriptor = descriptorMap.getProviderDescriptor(providerName);
             final ChannelDescriptor channelDescriptor = descriptorMap.getChannelDescriptor(channelName);
-            final UIConfig channelUIConfig = channelDescriptor.getUIConfig(ActionApiType.CHANNEL_DISTRIBUTION_CONFIG);
-            final UIConfig providerUIConfig = providerDescriptor.getUIConfig(ActionApiType.PROVIDER_DISTRIBUTION_CONFIG);
+            final UIConfig channelUIConfig = channelDescriptor.getUIConfig(ConfigContextEnum.DISTRIBUTION);
+            final UIConfig providerUIConfig = providerDescriptor.getUIConfig(ConfigContextEnum.DISTRIBUTION);
             final UIComponent channelUIComponent = channelUIConfig.generateUIComponent();
             final UIComponent providerUIComponent = providerUIConfig.generateUIComponent();
             final List<ConfigField> combinedFields = new ArrayList<>();

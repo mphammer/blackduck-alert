@@ -26,6 +26,7 @@ package com.synopsys.integration.alert.channel.slack;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,22 +37,23 @@ import org.springframework.stereotype.Component;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.synopsys.integration.alert.channel.event.DistributionEvent;
 import com.synopsys.integration.alert.channel.rest.ChannelRestConnectionFactory;
 import com.synopsys.integration.alert.channel.rest.RestDistributionChannel;
+import com.synopsys.integration.alert.channel.slack.descriptor.SlackUIConfig;
 import com.synopsys.integration.alert.common.AlertProperties;
+import com.synopsys.integration.alert.common.configuration.FieldAccessor;
 import com.synopsys.integration.alert.common.exception.AlertException;
 import com.synopsys.integration.alert.common.model.AggregateMessageContent;
 import com.synopsys.integration.alert.common.model.CategoryItem;
 import com.synopsys.integration.alert.common.model.LinkableItem;
 import com.synopsys.integration.alert.database.audit.AuditUtility;
-import com.synopsys.integration.alert.database.channel.slack.SlackDistributionConfigEntity;
-import com.synopsys.integration.alert.database.entity.channel.GlobalChannelConfigEntity;
 import com.synopsys.integration.alert.provider.blackduck.BlackDuckProperties;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.request.Request;
 
 @Component(value = SlackChannel.COMPONENT_NAME)
-public class SlackChannel extends RestDistributionChannel<GlobalChannelConfigEntity, SlackDistributionConfigEntity, SlackChannelEvent> {
+public class SlackChannel extends RestDistributionChannel {
     public static final String COMPONENT_NAME = "channel_slack";
     public static final String SLACK_API = "https://hooks.slack.com";
 
@@ -59,7 +61,8 @@ public class SlackChannel extends RestDistributionChannel<GlobalChannelConfigEnt
     private static final Map<String, String> SLACK_CHARACTER_ENCODING_MAP;
 
     static {
-        SLACK_CHARACTER_ENCODING_MAP = new HashMap<>();
+        // Insertion order matters, so '&' must always be inserted first.
+        SLACK_CHARACTER_ENCODING_MAP = new LinkedHashMap<>();
         SLACK_CHARACTER_ENCODING_MAP.put("&", "&amp;");
         SLACK_CHARACTER_ENCODING_MAP.put("<", "&lt;");
         SLACK_CHARACTER_ENCODING_MAP.put(">", "&gt;");
@@ -67,33 +70,32 @@ public class SlackChannel extends RestDistributionChannel<GlobalChannelConfigEnt
 
     @Autowired
     public SlackChannel(final Gson gson, final AlertProperties alertProperties, final BlackDuckProperties blackDuckProperties, final AuditUtility auditUtility,
-            final ChannelRestConnectionFactory channelRestConnectionFactory) {
-        super(gson, alertProperties, blackDuckProperties, auditUtility, null, SlackChannelEvent.class, channelRestConnectionFactory);
+        final ChannelRestConnectionFactory channelRestConnectionFactory) {
+        super(COMPONENT_NAME, gson, alertProperties, blackDuckProperties, auditUtility, channelRestConnectionFactory);
     }
 
     @Override
-    public String getDistributionType() {
-        return COMPONENT_NAME;
-    }
-
-    @Override
-    public String getApiUrl(final GlobalChannelConfigEntity globalConfig) {
+    public String getApiUrl(final DistributionEvent event) {
         return SLACK_API;
     }
 
     @Override
-    public List<Request> createRequests(final GlobalChannelConfigEntity globalConfig, final SlackChannelEvent event) throws IntegrationException {
-        if (StringUtils.isBlank(event.getWebHook())) {
+    public List<Request> createRequests(final DistributionEvent event) throws IntegrationException {
+        final FieldAccessor fields = event.getFieldAccessor();
+        final Optional<String> webhook = fields.getString(SlackUIConfig.KEY_WEBHOOK);
+        final Optional<String> channelName = fields.getString(SlackUIConfig.KEY_CHANNEL_NAME);
+        final Optional<String> channelUsername = fields.getString(SlackUIConfig.KEY_CHANNEL_USERNAME);
+        if (webhook.isPresent()) {
             throw new AlertException("Missing Webhook URL");
-        } else if (StringUtils.isBlank(event.getChannelName())) {
+        } else if (channelName.isPresent()) {
             throw new AlertException("Missing channel name");
         } else {
             if (StringUtils.isBlank(event.getContent().getValue())) {
                 return Collections.emptyList();
             } else {
-                final String slackUrl = event.getWebHook();
+                final String slackUrl = webhook.get();
                 final String mrkdwnMessage = createMrkdwnMessage(event.getContent());
-                final String jsonString = getJsonString(mrkdwnMessage, event.getChannelName(), event.getChannelUsername());
+                final String jsonString = getJsonString(mrkdwnMessage, channelName.get(), channelUsername.orElse(""));
 
                 final Map<String, String> requestHeaders = new HashMap<>();
                 requestHeaders.put("Content-Type", "application/json");
@@ -179,7 +181,7 @@ public class SlackChannel extends RestDistributionChannel<GlobalChannelConfigEnt
     private String createSlackString(final String unencodedString) {
         String newString = unencodedString;
         for (final Map.Entry<String, String> mapping : SLACK_CHARACTER_ENCODING_MAP.entrySet()) {
-            newString = unencodedString.replace(mapping.getKey(), mapping.getValue());
+            newString = newString.replace(mapping.getKey(), mapping.getValue());
         }
         return newString;
     }

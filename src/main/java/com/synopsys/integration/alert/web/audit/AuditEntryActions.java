@@ -24,7 +24,6 @@
 package com.synopsys.integration.alert.web.audit;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -48,6 +47,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.synopsys.integration.alert.channel.ChannelTemplateManager;
 import com.synopsys.integration.alert.channel.event.DistributionEvent;
+import com.synopsys.integration.alert.common.ContentConverter;
+import com.synopsys.integration.alert.common.configuration.CommonDistributionConfiguration;
 import com.synopsys.integration.alert.common.enumeration.AuditEntryStatus;
 import com.synopsys.integration.alert.common.exception.AlertException;
 import com.synopsys.integration.alert.database.audit.AuditEntryEntity;
@@ -59,7 +60,6 @@ import com.synopsys.integration.alert.database.entity.NotificationContent;
 import com.synopsys.integration.alert.web.exception.AlertJobMissingException;
 import com.synopsys.integration.alert.web.exception.AlertNotificationPurgedException;
 import com.synopsys.integration.alert.web.model.AlertPagedModel;
-import com.synopsys.integration.alert.web.model.CommonDistributionConfig;
 import com.synopsys.integration.alert.web.model.NotificationConfig;
 import com.synopsys.integration.alert.web.model.NotificationContentConverter;
 import com.synopsys.integration.alert.workflow.NotificationManager;
@@ -78,10 +78,12 @@ public class AuditEntryActions {
     private final NotificationContentConverter notificationContentConverter;
     private final ChannelTemplateManager channelTemplateManager;
     private final NotificationProcessor notificationProcessor;
+    private final ContentConverter contentConverter;
 
     @Autowired
     public AuditEntryActions(final AuditEntryRepository auditEntryRepository, final NotificationManager notificationManager, final AuditNotificationRepository auditNotificationRepository,
-        final JobConfigReader jobConfigReader, final NotificationContentConverter notificationContentConverter, final ChannelTemplateManager channelTemplateManager, final NotificationProcessor notificationProcessor) {
+        final JobConfigReader jobConfigReader, final NotificationContentConverter notificationContentConverter, final ChannelTemplateManager channelTemplateManager, final NotificationProcessor notificationProcessor,
+        final ContentConverter contentConverter) {
         this.auditEntryRepository = auditEntryRepository;
         this.notificationManager = notificationManager;
         this.auditNotificationRepository = auditNotificationRepository;
@@ -89,6 +91,7 @@ public class AuditEntryActions {
         this.notificationContentConverter = notificationContentConverter;
         this.channelTemplateManager = channelTemplateManager;
         this.notificationProcessor = notificationProcessor;
+        this.contentConverter = contentConverter;
     }
 
     public AlertPagedModel<AuditEntryModel> get() {
@@ -115,19 +118,19 @@ public class AuditEntryActions {
 
     public Set<String> resendNotification(final Long notificationdId, final Long commonConfigId) throws IntegrationException {
         final Optional<NotificationContent> notificationContentOptional = notificationManager.findById(notificationdId);
-        if (!notificationContentOptional.isPresent()) {
+        if (notificationContentOptional.isEmpty()) {
             throw new AlertNotificationPurgedException("No notification with this id exists.");
         }
         final NotificationContent notificationContent = notificationContentOptional.get();
         final Set<String> matchingDistributionJobs = new HashSet<>();
         final List<DistributionEvent> distributionEvents;
         if (null != commonConfigId) {
-            final Optional<? extends CommonDistributionConfig> commonDistributionConfig = jobConfigReader.getPopulatedConfig(commonConfigId);
-            if (!commonDistributionConfig.isPresent()) {
-                logger.warn("The Distribution Job with Id {} could not be found. This notification could not be sent", commonDistributionConfig.get().getId());
+            final Optional<CommonDistributionConfiguration> commonDistributionConfig = jobConfigReader.getPopulatedConfig(commonConfigId);
+            if (commonDistributionConfig.isEmpty()) {
+                logger.warn("The Distribution Job with Id {} could not be found. This notification could not be sent", commonConfigId);
                 throw new AlertJobMissingException("The Distribution Job with this id could not be found.");
             } else {
-                distributionEvents = notificationProcessor.processNotifications(commonDistributionConfig.get(), Arrays.asList(notificationContent));
+                distributionEvents = notificationProcessor.processNotifications(commonDistributionConfig.get(), List.of(notificationContent));
                 if (distributionEvents.isEmpty()) {
                     throw new AlertException("This notification could not be sent. This Distribution Job configured does not match the notification.");
                 } else {
@@ -135,14 +138,15 @@ public class AuditEntryActions {
                 }
             }
         } else {
-            distributionEvents = notificationProcessor.processNotifications(Arrays.asList(notificationContent));
-            if (distributionEvents.isEmpty()) {
-                logger.warn("This notification could not be sent. Make sure you have a Distribution Job configured to handle this notification.");
-            }
+            distributionEvents = notificationProcessor.processNotifications(List.of(notificationContent));
         }
-        distributionEvents.forEach(event -> {
-            final Long commonDistributionId = event.getCommonDistributionConfigId();
-            final Optional<? extends CommonDistributionConfig> commonDistributionConfig = jobConfigReader.getPopulatedConfig(commonDistributionId);
+        if (distributionEvents.isEmpty()) {
+            logger.warn("This notification could not be sent. Make sure you have a Distribution Job configured to handle this notification.");
+        }
+        distributionEvents.forEach(event ->
+        {
+            final Long commonDistributionId = contentConverter.getLongValue(event.getConfigId());
+            final Optional<CommonDistributionConfiguration> commonDistributionConfig = jobConfigReader.getPopulatedConfig(commonDistributionId);
             matchingDistributionJobs.add(commonDistributionConfig.get().getName());
 
             Long auditId = null;
@@ -236,12 +240,12 @@ public class AuditEntryActions {
             final String errorMessage = auditEntryEntity.getErrorMessage();
             final String errorStackTrace = auditEntryEntity.getErrorStackTrace();
 
-            final Optional<? extends CommonDistributionConfig> commonConfig = jobConfigReader.getPopulatedConfig(commonConfigId);
+            final Optional<CommonDistributionConfiguration> commonConfig = jobConfigReader.getPopulatedConfig(commonConfigId);
             String distributionConfigName = null;
             String eventType = null;
             if (commonConfig.isPresent()) {
                 distributionConfigName = commonConfig.get().getName();
-                eventType = commonConfig.get().getDistributionType();
+                eventType = commonConfig.get().getChannelName();
             }
 
             jobModels.add(new JobModel(id, configId, distributionConfigName, eventType, timeCreated, timeLastSent, status.getDisplayName(), errorMessage, errorStackTrace));
