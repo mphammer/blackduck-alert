@@ -63,8 +63,8 @@ public class BlackDuckProviderDescriptorActionApi extends DescriptorActionApi {
 
     @Override
     public void validateConfig(final FieldAccessor fieldAccessor, final Map<String, String> fieldErrors) {
-        final String timeout = fieldAccessor.getString(BlackDuckProviderUIConfig.KEY_BLACKDUCK_TIMEOUT).orElse(null);
-        final String apiKey = fieldAccessor.getString(BlackDuckProviderUIConfig.KEY_BLACKDUCK_API_KEY).orElse(null);
+        final String timeout = fieldAccessor.getString(BlackDuckDescriptor.KEY_BLACKDUCK_TIMEOUT).orElse(null);
+        final String apiKey = fieldAccessor.getString(BlackDuckDescriptor.KEY_BLACKDUCK_API_KEY).orElse(null);
         if (StringUtils.isNotBlank(timeout) && !StringUtils.isNumeric(timeout)) {
             fieldErrors.put("blackDuckTimeout", "Not an Integer.");
         }
@@ -81,9 +81,9 @@ public class BlackDuckProviderDescriptorActionApi extends DescriptorActionApi {
         final Slf4jIntLogger intLogger = new Slf4jIntLogger(logger);
 
         final FieldModel fieldModel = testConfig.getFieldModel();
-        final String apiToken = fieldModel.getField(BlackDuckProviderUIConfig.KEY_BLACKDUCK_API_KEY).getValue().orElse("");
-        final String url = fieldModel.getField(BlackDuckProviderUIConfig.KEY_BLACKDUCK_URL).getValue().orElse("");
-        final String timeout = fieldModel.getField(BlackDuckProviderUIConfig.KEY_BLACKDUCK_TIMEOUT).getValue().orElse("");
+        final String apiToken = fieldModel.getField(BlackDuckDescriptor.KEY_BLACKDUCK_API_KEY).getValue().orElse("");
+        final String url = fieldModel.getField(BlackDuckDescriptor.KEY_BLACKDUCK_URL).getValue().orElse("");
+        final String timeout = fieldModel.getField(BlackDuckDescriptor.KEY_BLACKDUCK_TIMEOUT).getValue().orElse("");
 
         final BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = blackDuckProperties.createServerConfigBuilderWithoutAuthentication(intLogger, NumberUtils.toInt(timeout, 300));
         blackDuckServerConfigBuilder.setApiToken(apiToken);
@@ -93,7 +93,7 @@ public class BlackDuckProviderDescriptorActionApi extends DescriptorActionApi {
 
         final BlackDuckRestConnection restConnection = createRestConnection(blackDuckServerConfigBuilder);
         final BlackDuckServerVerifier blackDuckServerVerifier = new BlackDuckServerVerifier();
-        blackDuckServerVerifier.verifyIsBlackDuckServer(restConnection.getBaseUrl(), restConnection.getProxyInfo(), restConnection.isAlwaysTrustServerCertificate(), restConnection.getTimeout());
+        blackDuckServerVerifier.verifyIsBlackDuckServer(restConnection.getBaseUrl(), restConnection.getProxyInfo(), restConnection.isAlwaysTrustServerCertificate(), restConnection.getTimeoutInSeconds());
 
         final Request authRequest = RequestFactory.createCommonGetRequest(url);
         try (final Response response = restConnection.execute(authRequest)) {

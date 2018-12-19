@@ -27,15 +27,16 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.validation.constraints.NotNull;
+
 import com.synopsys.integration.alert.common.descriptor.config.ui.CommonDistributionUIConfig;
 import com.synopsys.integration.alert.common.descriptor.config.ui.ProviderDistributionUIConfig;
 import com.synopsys.integration.alert.common.enumeration.FormatType;
 import com.synopsys.integration.alert.common.enumeration.FrequencyType;
 import com.synopsys.integration.alert.database.api.configuration.ConfigurationAccessor.ConfigurationModel;
-import com.synopsys.integration.alert.provider.blackduck.descriptor.BlackDuckDistributionUIConfig;
+import com.synopsys.integration.alert.provider.blackduck.descriptor.BlackDuckDescriptor;
 
 public class CommonDistributionConfiguration extends Configuration {
-
     private final String name;
     private final String channelName;
     private final String providerName;
@@ -47,9 +48,9 @@ public class CommonDistributionConfiguration extends Configuration {
     // FIXME this field is here temporarily as there is some tight coupling to the BD provider.
     private final String projectNamePattern;
     // FIXME this field is here temporarily as there is some tight coupling to the BD provider.
-    private final Set<String> configuredProject;
+    private final Set<String> configuredProjects;
 
-    public CommonDistributionConfiguration(final ConfigurationModel configurationModel) {
+    public CommonDistributionConfiguration(@NotNull final ConfigurationModel configurationModel) {
         super(configurationModel);
 
         name = getFieldAccessor().getString(CommonDistributionUIConfig.KEY_NAME).orElse(null);
@@ -58,9 +59,9 @@ public class CommonDistributionConfiguration extends Configuration {
         notificationTypes = getFieldAccessor().getAllStrings(ProviderDistributionUIConfig.KEY_NOTIFICATION_TYPES).stream().collect(Collectors.toSet());
         frequencyType = getFieldAccessor().getEnum(CommonDistributionUIConfig.KEY_FREQUENCY, FrequencyType.class).orElse(null);
         formatType = getFieldAccessor().getEnum(ProviderDistributionUIConfig.KEY_FORMAT_TYPE, FormatType.class).orElse(null);
-        filterByProject = getFieldAccessor().getBoolean(BlackDuckDistributionUIConfig.KEY_FILTER_BY_PROJECT).orElse(null);
-        projectNamePattern = getFieldAccessor().getString(BlackDuckDistributionUIConfig.KEY_PROJECT_NAME_PATTERN).orElse(null);
-        configuredProject = getFieldAccessor().getAllStrings(BlackDuckDistributionUIConfig.KEY_CONFIGURED_PROJECT).stream().collect(Collectors.toSet());
+        filterByProject = getFieldAccessor().getBoolean(BlackDuckDescriptor.KEY_FILTER_BY_PROJECT).orElse(null);
+        projectNamePattern = getFieldAccessor().getString(BlackDuckDescriptor.KEY_PROJECT_NAME_PATTERN).orElse(null);
+        configuredProjects = getFieldAccessor().getAllStrings(BlackDuckDescriptor.KEY_CONFIGURED_PROJECT).stream().collect(Collectors.toSet());
     }
 
     public String getName() {
@@ -95,8 +96,8 @@ public class CommonDistributionConfiguration extends Configuration {
         return projectNamePattern;
     }
 
-    public Set<String> getConfiguredProject() {
-        return configuredProject;
+    public Set<String> getConfiguredProjects() {
+        return configuredProjects;
     }
 
 }

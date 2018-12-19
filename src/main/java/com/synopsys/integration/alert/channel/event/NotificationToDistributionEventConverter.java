@@ -26,7 +26,6 @@ package com.synopsys.integration.alert.channel.event;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,28 +33,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.synopsys.integration.alert.common.configuration.CommonDistributionConfiguration;
+import com.synopsys.integration.alert.common.descriptor.ChannelDescriptor;
 import com.synopsys.integration.alert.common.descriptor.DescriptorMap;
+import com.synopsys.integration.alert.common.descriptor.config.context.DescriptorActionApi;
 import com.synopsys.integration.alert.common.enumeration.ConfigContextEnum;
 import com.synopsys.integration.alert.common.model.AggregateMessageContent;
 
 @Component
-public class NotificationToChannelEventConverter {
-    private final Logger logger = LoggerFactory.getLogger(NotificationToChannelEventConverter.class);
+public class NotificationToDistributionEventConverter {
+    private final Logger logger = LoggerFactory.getLogger(NotificationToDistributionEventConverter.class);
     private final DescriptorMap descriptorMap;
 
     @Autowired
-    public NotificationToChannelEventConverter(final DescriptorMap descriptorMap) {
+    public NotificationToDistributionEventConverter(final DescriptorMap descriptorMap) {
         this.descriptorMap = descriptorMap;
     }
 
     public List<DistributionEvent> convertToEvents(final Map<CommonDistributionConfiguration, List<AggregateMessageContent>> messageContentMap) {
         final List<DistributionEvent> distributionEvents = new ArrayList<>();
-        final Set<? extends Map.Entry<CommonDistributionConfiguration, List<AggregateMessageContent>>> jobMessageContentEntries = messageContentMap.entrySet();
-        for (final Map.Entry<CommonDistributionConfiguration, List<AggregateMessageContent>> entry : jobMessageContentEntries) {
-            final CommonDistributionConfiguration jobConfig = entry.getKey();
-            final List<AggregateMessageContent> contentList = entry.getValue();
-            for (final AggregateMessageContent content : contentList) {
-                distributionEvents.add(createChannelEvent(jobConfig, content));
+        for (final Map.Entry<CommonDistributionConfiguration, List<AggregateMessageContent>> entry : messageContentMap.entrySet()) {
+            for (final AggregateMessageContent content : entry.getValue()) {
+                distributionEvents.add(createChannelEvent(entry.getKey(), content));
             }
         }
         logger.debug("Created {} events.", distributionEvents.size());
@@ -63,6 +61,9 @@ public class NotificationToChannelEventConverter {
     }
 
     private DistributionEvent createChannelEvent(final CommonDistributionConfiguration config, final AggregateMessageContent messageContent) {
-        return descriptorMap.getChannelDescriptor(config.getChannelName()).getRestApi(ConfigContextEnum.DISTRIBUTION).createChannelEvent(config, messageContent);
+        final ChannelDescriptor channelDescriptor = descriptorMap.getChannelDescriptor(config.getChannelName());
+        logger.info("Found descriptor {}", channelDescriptor.getName());
+        final DescriptorActionApi actionApi = channelDescriptor.getRestApi(ConfigContextEnum.DISTRIBUTION);
+        return actionApi.createChannelEvent(config, messageContent);
     }
 }
