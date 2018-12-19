@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.Before;
@@ -80,14 +81,14 @@ public class AuditEntryActionsTest {
         final AuditEntryActions auditEntryActions = new AuditEntryActions(auditEntryRepository, new NotificationManager(notificationRepository, auditEntryRepository, auditNotificationRepository, notificationContentConverter,
             jobConfigReader), auditNotificationRepository, jobConfigReader, null, null, null, null);
 
-        AlertPagedModel<AuditEntryModel> restModel = null;
+        Set<String> matchingProjects = null;
         try {
-            restModel = auditEntryActions.resendNotification(1L, null);
+            matchingProjects = auditEntryActions.resendNotification(1L, null);
             fail();
         } catch (final IntegrationException e) {
         }
 
-        assertNull(restModel);
+        assertNull(matchingProjects);
     }
 
     @Test

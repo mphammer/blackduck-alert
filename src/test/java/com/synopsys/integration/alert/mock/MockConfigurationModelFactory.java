@@ -82,12 +82,13 @@ public class MockConfigurationModelFactory {
         final ConfigurationFieldModel name = createFieldModel(CommonDistributionUIConfig.KEY_NAME, jobName);
         final ConfigurationFieldModel channelName = createFieldModel(CommonDistributionUIConfig.KEY_CHANNEL_NAME, channelDescriptorName);
         final ConfigurationFieldModel providerName = createFieldModel(CommonDistributionUIConfig.KEY_PROVIDER_NAME, BlackDuckProvider.COMPONENT_NAME);
-        final ConfigurationFieldModel notificationTypes = createFieldModel(ProviderDistributionUIConfig.KEY_NOTIFICATION_TYPES, List.of(NotificationType.VULNERABILITY.toString(), NotificationType.RULE_VIOLATION.toString()));
+        final ConfigurationFieldModel notificationTypes = createFieldModel(ProviderDistributionUIConfig.KEY_NOTIFICATION_TYPES,
+            List.of(NotificationType.VULNERABILITY.toString(), NotificationType.POLICY_OVERRIDE.toString(), NotificationType.RULE_VIOLATION.toString()));
         final ConfigurationFieldModel frequencyType = createFieldModel(CommonDistributionUIConfig.KEY_FREQUENCY, FrequencyType.REAL_TIME.toString());
         final ConfigurationFieldModel formatType = createFieldModel(ProviderDistributionUIConfig.KEY_FORMAT_TYPE, FormatType.DEFAULT.toString());
         final ConfigurationFieldModel filterByProject = createFieldModel(BlackDuckDescriptor.KEY_FILTER_BY_PROJECT, "true");
         final ConfigurationFieldModel projectNamePattern = createFieldModel(BlackDuckDescriptor.KEY_PROJECT_NAME_PATTERN, ".*UnitTest.*");
-        final ConfigurationFieldModel configuredProject = createFieldModel(BlackDuckDescriptor.KEY_CONFIGURED_PROJECT, List.of("TestProject1", "TestProject2"));
+        final ConfigurationFieldModel configuredProject = createFieldModel(BlackDuckDescriptor.KEY_CONFIGURED_PROJECT, List.of("TestProject1", "TestProject2", "example"));
 
         fields.add(name);
         fields.add(channelName);
