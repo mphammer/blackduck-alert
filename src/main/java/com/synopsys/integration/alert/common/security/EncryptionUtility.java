@@ -53,35 +53,49 @@ public class EncryptionUtility {
     }
 
     public String encrypt(final String value) {
-        final TextEncryptor encryptor = Encryptors.delux(getPassword(), getEncodedSalt());
-        return encryptor.encrypt(value);
+        if (StringUtils.isNotBlank(value)) {
+            final TextEncryptor encryptor = Encryptors.delux(getPassword(), getEncodedSalt());
+            return encryptor.encrypt(value);
+        }
+        return StringUtils.EMPTY;
     }
 
     public String decrypt(final String encryptedValue) {
-        String decryptedValue = "";
         try {
-            final TextEncryptor decryptor = Encryptors.delux(getPassword(), getEncodedSalt());
-            decryptedValue = decryptor.decrypt(encryptedValue);
+            if (StringUtils.isNotBlank(encryptedValue)) {
+                final TextEncryptor decryptor = Encryptors.delux(getPassword(), getEncodedSalt());
+                return decryptor.decrypt(encryptedValue);
+            }
         } catch (final IllegalArgumentException | NullPointerException ex) {
             logger.error("Error decrypting value", ex);
         }
-        return decryptedValue;
+        return StringUtils.EMPTY;
     }
 
     public boolean isInitialized() {
         return isPasswordSet() && isGlobalSaltSet();
     }
 
-    public void updateEncryptionFields(final String password, final String globalSalt) throws IOException {
+    public void updatePasswordField(final String password) throws IOException {
         if (StringUtils.isBlank(password)) {
             throw new IllegalArgumentException("Encryption password cannot be blank");
         }
 
+        final EncryptionFileData encryptionFileData = new EncryptionFileData(password, getGlobalSalt());
+        filePersistenceUtil.writeJsonToFile(DATA_FILE_NAME, encryptionFileData);
+    }
+
+    public void updateSaltField(final String globalSalt) throws IOException {
         if (StringUtils.isBlank(globalSalt)) {
             throw new IllegalArgumentException("Encryption global salt cannot be blank");
         }
-        final EncryptionFileData encryptionFileData = new EncryptionFileData(password, globalSalt);
+        final EncryptionFileData encryptionFileData = new EncryptionFileData(getPassword(), globalSalt);
         filePersistenceUtil.writeJsonToFile(DATA_FILE_NAME, encryptionFileData);
+    }
+
+    public void updateEncryptionFields(final String password, final String globalSalt) throws IOException {
+        updatePasswordField(password);
+        updateSaltField(globalSalt);
     }
 
     private String getEncodedSalt() {

@@ -32,6 +32,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,6 +110,12 @@ public class EmailGroupChannel extends DistributionChannel {
         Set<String> emailAddresses = null;
         final String testEmailAddress = testConfig.getDestination().orElse(null);
         if (StringUtils.isNotBlank(testEmailAddress)) {
+            try {
+                final InternetAddress emailAddr = new InternetAddress(testEmailAddress);
+                emailAddr.validate();
+            } catch (final AddressException ex) {
+                throw new AlertException(String.format("%s is not a valid email address. %s", testEmailAddress, ex.getMessage()));
+            }
             emailAddresses = Collections.singleton(testEmailAddress);
         }
         final FieldAccessor fieldAccessor = testConfig.getFieldModel().convertToFieldAccessor();
@@ -132,9 +141,7 @@ public class EmailGroupChannel extends DistributionChannel {
             model.put("emailCategory", formatType);
             model.put(EmailPropertyKeys.TEMPLATE_KEY_SUBJECT_LINE.getPropertyKey(), subjectLine);
             final Optional<String> optionalBlackDuckUrl = getBlackDuckProperties().getBlackDuckUrl();
-            if (optionalBlackDuckUrl.isPresent()) {
-                model.put(EmailPropertyKeys.TEMPLATE_KEY_BLACKDUCK_SERVER_URL.getPropertyKey(), StringUtils.trimToEmpty(optionalBlackDuckUrl.get()));
-            }
+            model.put(EmailPropertyKeys.TEMPLATE_KEY_BLACKDUCK_SERVER_URL.getPropertyKey(), StringUtils.trimToEmpty(optionalBlackDuckUrl.orElse("#")));
             model.put(EmailPropertyKeys.TEMPLATE_KEY_BLACKDUCK_PROJECT_NAME.getPropertyKey(), blackDuckProjectName);
 
             model.put(EmailPropertyKeys.TEMPLATE_KEY_START_DATE.getPropertyKey(), String.valueOf(System.currentTimeMillis()));
