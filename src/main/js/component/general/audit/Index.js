@@ -107,6 +107,7 @@ class Index extends Component {
                     case 403:
                         this.props.logout();
                         return response.json().then((json) => {
+                            alert(json.message);
                             this.setState({message: json.message});
                         });
                 }
@@ -125,6 +126,7 @@ class Index extends Component {
                 });
                 let matchedProjectMessage = "This notification matched these jobs: " + projects;
                 alert(matchedProjectMessage);
+                // TODO show custom modal with option (in state) to hide the modal in future resends if resending a lot
                 // TODO handle the display of the projects better
             });
         }).catch(console.error);
