@@ -77,7 +77,7 @@ class Details extends Component {
         const jsonPrettyPrintContent = JSON.stringify(jsonContent, null, 2);
         const jobs = this.props.currentEntry.jobs;
         return (
-            <Modal size="lg" show={this.props.show} onHide={this.props.handleClose}>
+            <Modal size="lg" show={this.props.showDetailModal} onHide={this.props.handleClose('showDetailModal')}>
                 <Modal.Header closeButton>
                     <Modal.Title>
                         <div className="notificationTitlePiece">

@@ -12,6 +12,7 @@ import '../../../../css/audit.scss';
 import {logout} from '../../../store/actions/session';
 import AuditDetails from "./Details";
 import CheckboxInput from "../../../field/input/CheckboxInput";
+import AlertMessageModal from "../../common/AlertMessageModal";
 
 class Index extends Component {
     constructor(props) {
@@ -26,7 +27,11 @@ class Index extends Component {
             sortOrder: 'desc',
             onlyShowSentNotifications: true,
             currentRowSelected: {},
-            showDetailModal: false
+            showDetailModal: false,
+            showErrorModal: false,
+            showResendModal: false,
+            errorModalMessage: '',
+            resendModalMessage: ''
         };
         // this.addDefaultEntries = this.addDefaultEntries.bind(this);
         this.cancelAutoReload = this.cancelAutoReload.bind(this);
@@ -47,7 +52,7 @@ class Index extends Component {
         this.onSearchChange = this.onSearchChange.bind(this);
         this.providerColumnDataFormat = this.providerColumnDataFormat.bind(this);
         this.onSortChange = this.onSortChange.bind(this);
-        this.handleCloseDetails = this.handleCloseDetails.bind(this);
+        this.handleCloseModal = this.handleCloseModal.bind(this);
         this.onRowClick = this.onRowClick.bind(this);
     }
 
@@ -101,16 +106,22 @@ class Index extends Component {
                 inProgress: false
             });
             if (!response.ok) {
-                switch (response.status) {
-                    // TODO handle error messages better, the message disappears almost instantly
-                    case 401:
-                    case 403:
-                        this.props.logout();
-                        return response.json().then((json) => {
-                            alert(json.message);
-                            this.setState({message: json.message});
-                        });
-                }
+                this.setState({
+                    showErrorModal: true,
+                    errorModalMessage: response.text()
+
+                });
+                // switch (response.status) {
+                //     // TODO handle error messages better, the message disappears almost instantly
+                //     case 401:
+                //     case 403:
+                //         this.props.logout();
+                //         return response.json().then((json) => {
+                //
+                //             alert(json.message);
+                //             this.setState({message: json.message});
+                //         });
+                // }
             }
             return response.json().then((json) => {
                 this.reloadAuditEntries();
@@ -125,7 +136,12 @@ class Index extends Component {
                     }
                 });
                 let matchedProjectMessage = "This notification matched these jobs: " + projects;
-                alert(matchedProjectMessage);
+                this.setState({
+                    showResendModal: true,
+                    resendModalMessage: projects
+
+                });
+                // alert(matchedProjectMessage);
                 // TODO show custom modal with option (in state) to hide the modal in future resends if resending a lot
                 // TODO handle the display of the projects better
             });
@@ -349,8 +365,8 @@ class Index extends Component {
         this.setState({currentRowSelected: row, showDetailModal: true});
     }
 
-    handleCloseDetails() {
-        this.setState({showDetailModal: false});
+    handleCloseModal(showName) {
+        this.setState({[showName]: false});
     }
 
     render() {
@@ -376,6 +392,8 @@ class Index extends Component {
 
         return (
             <div>
+                <AlertMessageModal showMessageModal={this.state.showErrorModal} showPropName={'showErrorModal'} modalTitle={'Error message'} message={this.state.errorModalMessage}/>
+                <AlertMessageModal showMessageModal={this.state.showResendModal} showPropName={'showResendModal'} modalTitle={'Notification matched these jobs'} message={this.state.resendModalMessage}/>
                 <h1>
                     <span className="fa fa-history"/>
                     Audit
@@ -393,7 +411,7 @@ class Index extends Component {
                     </small>
                 </h1>
                 <div>
-                    <AuditDetails handleClose={this.handleCloseDetails} show={this.state.showDetailModal} currentEntry={this.state.currentRowSelected} resendNotification={this.resendNotification}
+                    <AuditDetails handleClose={this.handleCloseModal} showDetailModal={this.state.showDetailModal} currentEntry={this.state.currentRowSelected} resendNotification={this.resendNotification}
                                   providerNameFormat={this.providerColumnDataFormat} notificationTypeFormat={this.notificationTypeDataFormat} statusFormat={this.statusColumnDataFormat}/>
                     <BootstrapTable
                         version="4"
