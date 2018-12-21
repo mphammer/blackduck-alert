@@ -248,7 +248,11 @@ public class AuditEntryActions {
                 eventType = commonConfig.get().getChannelName();
             }
 
-            jobModels.add(new JobModel(id, configId, distributionConfigName, eventType, timeCreated, timeLastSent, status.getDisplayName(), errorMessage, errorStackTrace));
+            String statusDisplayName = null;
+            if (null != status) {
+                statusDisplayName = status.getDisplayName();
+            }
+            jobModels.add(new JobModel(id, configId, distributionConfigName, eventType, timeCreated, timeLastSent, statusDisplayName, errorMessage, errorStackTrace));
         }
         final String id = notificationContentConverter.getContentConverter().getStringValue(notificationContentEntry.getId());
         final NotificationConfig notificationConfig = (NotificationConfig) notificationContentConverter.populateConfigFromEntity(notificationContentEntry);

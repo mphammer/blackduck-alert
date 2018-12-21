@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -16,7 +15,6 @@ import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.support.DefaultConversionService;
 
@@ -90,13 +88,9 @@ public abstract class ChannelDescriptorTest extends FieldRegistrationIntegration
         }
     }
 
-    public Map<String, FieldValueModel> createFieldModelMap() {
-        final List<ConfigurationFieldModel> configModels = new LinkedList<>();
-        configModels.addAll(distribution_config.getCopyOfFieldList());
-        global_config.ifPresent(model -> configModels.addAll(model.getCopyOfFieldList()));
-
+    public Map<String, FieldValueModel> createFieldModelMap(final List<ConfigurationFieldModel> configFieldModels) {
         final Map<String, FieldValueModel> fieldModelMap = new HashMap<>();
-        for (final ConfigurationFieldModel model : configModels) {
+        for (final ConfigurationFieldModel model : configFieldModels) {
             final String key = model.getFieldKey();
             Collection<String> values = Collections.emptyList();
             if (!model.isSensitive()) {
@@ -108,9 +102,12 @@ public abstract class ChannelDescriptorTest extends FieldRegistrationIntegration
         return fieldModelMap;
     }
 
-    public FieldModel createValidFieldModel() {
-        final Map<String, FieldValueModel> valueMap = createFieldModelMap();
-        final FieldModel model = new FieldModel(String.valueOf(distribution_config.getConfigurationId()), getDescriptor().getDestinationName(), ConfigContextEnum.DISTRIBUTION.name(), valueMap);
+    public FieldModel createValidFieldModel(final ConfigurationAccessor.ConfigurationModel configurationModel, final ConfigContextEnum context) {
+        final Map<String, FieldValueModel> fieldValueMap = createFieldModelMap(configurationModel.getCopyOfFieldList());
+        if (ConfigContextEnum.DISTRIBUTION == context) {
+            global_config.ifPresent(globalConfig -> fieldValueMap.putAll(createFieldModelMap(globalConfig.getCopyOfFieldList())));
+        }
+        final FieldModel model = new FieldModel(String.valueOf(configurationModel.getConfigurationId()), getDescriptor().getDestinationName(), context.name(), fieldValueMap);
         return model;
 
     }
@@ -161,64 +158,78 @@ public abstract class ChannelDescriptorTest extends FieldRegistrationIntegration
 
     public abstract boolean assertDistributionFields(Collection<DefinedFieldModel> distributionFields);
 
+    public abstract String createTestConfigDestination();
+
     public abstract Map<String, String> createInvalidGlobalFieldMap();
 
     public abstract Map<String, String> createInvalidDistributionFieldMap();
 
+    public abstract String getTestJobName();
+
     @Test
-    public void testSendTestMessage() throws Exception {
+    public void testDistributionConfig() throws Exception {
         final DescriptorActionApi descriptorActionApi = getDescriptor().getRestApi(ConfigContextEnum.DISTRIBUTION);
-        final DescriptorActionApi spyDescriptorConfig = Mockito.spy(descriptorActionApi);
-        final FieldModel restModel = createValidFieldModel();
+        final FieldModel restModel = createValidFieldModel(distribution_config, ConfigContextEnum.DISTRIBUTION);
+        final FieldValueModel jobNameField = restModel.getField(CommonDistributionUIConfig.KEY_NAME);
+        jobNameField.setValue(getTestJobName());
         try {
-            spyDescriptorConfig.testConfig(spyDescriptorConfig.createTestConfigModel(restModel, getDescriptor().getDestinationName()));
+            descriptorActionApi.testConfig(descriptorActionApi.createTestConfigModel(restModel, createTestConfigDestination()));
         } catch (final IntegrationException e) {
             e.printStackTrace();
             Assert.fail();
         }
+    }
 
-        Mockito.verify(spyDescriptorConfig).testConfig(Mockito.any());
+    @Test
+    public void testGlobalConfig() {
+        final DescriptorActionApi descriptorActionApi = getDescriptor().getRestApi(ConfigContextEnum.GLOBAL);
+        assumeTrue(null != descriptorActionApi);
+        final FieldModel restModel = createValidFieldModel(global_config.orElse(null), ConfigContextEnum.GLOBAL);
+        try {
+            descriptorActionApi.testConfig(descriptorActionApi.createTestConfigModel(restModel, createTestConfigDestination()));
+        } catch (final IntegrationException e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
     }
 
     @Test
     public void testCreateChannelEvent() {
         final DistributionEvent channelEvent = this.createChannelEvent();
-
         assertEquals(String.valueOf(distribution_config.getConfigurationId()), channelEvent.getConfigId());
         assertEquals(36, channelEvent.getEventId().length());
         assertEquals(getDescriptor().getDestinationName(), channelEvent.getDestination());
     }
 
     @Test
-    public void testDistributionValidate() {
+    public void testDistributionValidate() throws Exception {
         final DescriptorActionApi descriptorActionApi = getDescriptor().getRestApi(ConfigContextEnum.DISTRIBUTION);
-        final DescriptorActionApi spyDescriptorConfig = Mockito.spy(descriptorActionApi);
-        final FieldModel restModel = createValidFieldModel();
-        spyDescriptorConfig.validateConfig(restModel.convertToFieldAccessor(), new HashMap<>());
-        Mockito.verify(spyDescriptorConfig).validateConfig(Mockito.any(), Mockito.anyMap());
+        final FieldModel restModel = createValidFieldModel(distribution_config, ConfigContextEnum.DISTRIBUTION);
+        final FieldValueModel jobNameField = restModel.getField(CommonDistributionUIConfig.KEY_NAME);
+        jobNameField.setValue(getTestJobName());
+        final HashMap<String, String> fieldErrors = new HashMap<>();
+        final List<ConfigurationAccessor.ConfigurationModel> models = configurationAccessor.getConfigurationsByDescriptorName(getDescriptor().getName());
+        descriptorActionApi.validateConfig(restModel.convertToFieldAccessor(), fieldErrors);
+        assertTrue(fieldErrors.isEmpty());
     }
 
     @Test
     public void testDistributionValidateWithFieldErrors() {
         final DescriptorActionApi descriptorActionApi = getDescriptor().getRestApi(ConfigContextEnum.DISTRIBUTION);
-        final DescriptorActionApi spyDescriptorConfig = Mockito.spy(descriptorActionApi);
         final FieldModel restModel = createInvalidDistributionFieldModel();
         final HashMap<String, String> fieldErrors = new HashMap<>();
-        spyDescriptorConfig.validateConfig(restModel.convertToFieldAccessor(), fieldErrors);
+        descriptorActionApi.validateConfig(restModel.convertToFieldAccessor(), fieldErrors);
         assertEquals(restModel.getKeyToValues().size(), fieldErrors.size());
-        Mockito.verify(spyDescriptorConfig).validateConfig(Mockito.any(), Mockito.anyMap());
     }
 
     @Test
     public void testGlobalValidate() {
         final DescriptorActionApi descriptorActionApi = getDescriptor().getRestApi(ConfigContextEnum.GLOBAL);
         assumeTrue(null != descriptorActionApi);
-        final DescriptorActionApi spyDescriptorConfig = Mockito.spy(descriptorActionApi);
-        final FieldModel restModel = createValidFieldModel();
+        final FieldModel restModel = createValidFieldModel(global_config.orElse(null), ConfigContextEnum.GLOBAL);
         final HashMap<String, String> fieldErrors = new HashMap<>();
-        spyDescriptorConfig.validateConfig(restModel.convertToFieldAccessor(), fieldErrors);
+        descriptorActionApi.validateConfig(restModel.convertToFieldAccessor(), fieldErrors);
         assertTrue(fieldErrors.isEmpty());
-        Mockito.verify(spyDescriptorConfig).validateConfig(Mockito.any(), Mockito.anyMap());
     }
 
     @Test
@@ -226,12 +237,10 @@ public abstract class ChannelDescriptorTest extends FieldRegistrationIntegration
         final DescriptorActionApi descriptorActionApi = getDescriptor().getRestApi(ConfigContextEnum.GLOBAL);
         assumeTrue(null != descriptorActionApi);
         // descriptor has a global configuration therefore continue testing
-        final DescriptorActionApi spyDescriptorConfig = Mockito.spy(descriptorActionApi);
         final FieldModel restModel = createInvalidGlobalFieldModel();
         final HashMap<String, String> fieldErrors = new HashMap<>();
-        spyDescriptorConfig.validateConfig(restModel.convertToFieldAccessor(), fieldErrors);
+        descriptorActionApi.validateConfig(restModel.convertToFieldAccessor(), fieldErrors);
         assertEquals(restModel.getKeyToValues().size(), fieldErrors.size());
-        Mockito.verify(spyDescriptorConfig).validateConfig(Mockito.any(), Mockito.anyMap());
     }
 
     @Test
