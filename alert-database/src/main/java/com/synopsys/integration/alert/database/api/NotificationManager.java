@@ -125,7 +125,7 @@ public class NotificationManager {
         deleteAuditEntries(notification.getId());
     }
 
-    public PageRequest getPageRequestForNotifications(final Integer pageNumber, final Integer pageSize, final String sortField, final String sortOrder) {
+    public PageRequest createPageRequestForNotifications(final Integer pageNumber, final Integer pageSize, final String sortField, final String sortOrder) {
         final Integer page = ObjectUtils.defaultIfNull(pageNumber, 0);
         final Integer size = ObjectUtils.defaultIfNull(pageSize, Integer.MAX_VALUE);
         boolean sortQuery = false;
