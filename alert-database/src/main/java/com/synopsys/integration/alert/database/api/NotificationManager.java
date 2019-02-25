@@ -107,13 +107,14 @@ public class NotificationManager {
         return notificationContentRepository.findByCreatedAtBefore(date);
     }
 
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<AlertNotificationWrapper> findByCreatedAtBeforeDayOffset(final int dayOffset) {
         ZonedDateTime zonedDate = ZonedDateTime.now();
         zonedDate = zonedDate.minusDays(dayOffset);
         zonedDate = zonedDate.withZoneSameInstant(ZoneOffset.UTC);
         zonedDate = zonedDate.withHour(0).withMinute(0).withSecond(0).withNano(0);
         final Date date = Date.from(zonedDate.toInstant());
-        return findByCreatedAtBefore(date);
+        return notificationContentRepository.findByCreatedAtBefore(date);
     }
 
     public void deleteNotificationList(final List<AlertNotificationWrapper> notifications) {
